@@ -175,6 +175,30 @@ export default function ProgressPage() {
             )}
           </div>
 
+          {/* 压缩阶段 */}
+          <div className="kenya-card">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl
+                  ${taskData.current_layer === 'compressing' ? 'bg-kenya-line text-white animate-pulse' : 
+                    taskData.current_layer && taskData.current_layer !== 'pending' && taskData.current_layer !== 'compressing' ? 'bg-kenya-dark text-white' : 
+                    'bg-kenya-line/30 text-kenya-dark/50'}`}>
+                  📝
+                </div>
+                <div>
+                  <h3 className="font-medium text-lg">文本压缩</h3>
+                  <p className="text-sm text-kenya-dark/60">使用 Claude 压缩原始文本，保留关键信息</p>
+                </div>
+              </div>
+              <div className="text-sm text-kenya-dark/60">
+                {taskData.current_layer === 'compressing' && '处理中...'}
+                {taskData.current_layer === 'compression_failed' && '❌ 失败'}
+                {taskData.current_layer && taskData.current_layer !== 'pending' && taskData.current_layer !== 'compressing' && taskData.current_layer !== 'compression_failed' && '✓ 已完成'}
+                {(taskData.current_layer === 'pending' || !taskData.current_layer) && '等待中'}
+              </div>
+            </div>
+          </div>
+
           {/* Layer 1 */}
           <div className="kenya-card">
             <div className="flex items-center justify-between mb-4">

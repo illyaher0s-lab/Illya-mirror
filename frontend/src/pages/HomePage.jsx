@@ -227,9 +227,9 @@ export default function HomePage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-medium">{task.title}</h3>
-                      <span className={`px-3 py-1 text-xs rounded-full ${getStatusColor(task.status)}`}>
-                        {getStatusText(task.status)}
+                      <h3 className="text-xl font-medium">{task.name}</h3>
+                      <span className={`px-3 py-1 text-xs rounded-full ${getStatusColor(task.status, task.current_layer)}`}>
+                        {getStatusText(task.status, task.current_layer)}
                       </span>
                     </div>
                     
