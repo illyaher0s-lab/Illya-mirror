@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #2B2B2B;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@layer components {
+  /* Kenya Hara 风格卡片 */
+  .kenya-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 0;
+    padding: 30px;
+  }
+
+  /* Kenya Hara 风格按钮 */
+  .kenya-button {
+    background: #2B2B2B;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 0;
+    transition: transform 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .kenya-button:hover {
+    transform: scale(1.05);
+  }
+  
+  .kenya-button:active {
+    transform: scale(0.95);
+  }
+
+  /* Kenya Hara 风格输入框 */
+  .kenya-input {
+    border: 1px solid #8B7D6F;
+    background: rgba(255, 255, 255, 0.5);
+    padding: 12px 16px;
+    border-radius: 0;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  
+  .kenya-input:focus {
+    border-color: #2B2B2B;
+  }
+
+  /* 装饰性平行线 */
+  .kenya-lines {
+    position: relative;
+  }
+  
+  .kenya-lines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background: 
+      linear-gradient(to bottom, 
+        #000 0px, #000 1px, transparent 1px, transparent 2px,
+        #000 2px, #000 4px, transparent 4px, transparent 5px,
+        #000 5px, #000 8px, transparent 8px, transparent 9px,
+        #000 9px, #000 10px
+      );
+  }
+
+  /* 巨大数字背景 */
+  .kenya-number-bg {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .kenya-number-bg::before {
+    content: attr(data-number);
+    position: absolute;
+    font-size: 300px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.15);
+    font-family: Georgia, serif;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+  }
+}
