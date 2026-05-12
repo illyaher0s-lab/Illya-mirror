@@ -1,5 +1,5 @@
 """
-Claude API integration for three-layer cognitive distillation.
+Claude API integration for text compression and three-layer cognitive distillation.
 """
 import os
 import json
@@ -22,6 +22,44 @@ def get_client() -> Anthropic:
         return Anthropic(api_key=api_key, base_url=base_url)
     else:
         return Anthropic(api_key=api_key)
+
+
+def compress_text(raw_text: str) -> str:
+    """
+    Compress raw text into structured format for distillation.
+    
+    Args:
+        raw_text: Original long-form text
+        
+    Returns:
+        Compressed structured text
+    """
+    client = get_client()
+    
+    prompt = """你是一个文本压缩专家。请将输入的长文本压缩为结构化格式，保留所有关键信息，但去除冗余和重复。
+
+要求：
+1. 保留所有核心观点、论据、例子
+2. 保持逻辑结构清晰
+3. 使用简洁的语言
+4. 不要改变原文的意思和语气
+5. 输出格式：markdown，使用标题、列表等结构化元素
+
+直接输出压缩后的文本，不要添加任何解释或元信息。"""
+    
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=8000,
+        temperature=0,
+        messages=[
+            {
+                "role": "user",
+                "content": f"{prompt}\n\n---\n\n## 原始文本\n\n{raw_text}"
+            }
+        ]
+    )
+    
+    return message.content[0].text
 
 
 def extract_layer1(compressed_text: str) -> dict:

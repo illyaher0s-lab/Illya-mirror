@@ -6,12 +6,7 @@ export default function UploadPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: '',
-    content: '',
-    cognitive_profile: {
-      reading_speed: 'medium',
-      focus_duration: 'medium',
-      preferred_depth: 'medium'
-    }
+    content: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -88,7 +83,7 @@ export default function UploadPage() {
       <div className="bg-kenya-cream py-12">
         <div className="max-w-4xl mx-auto px-6">
           <h1 className="font-serif text-5xl mb-2">创建蒸馏任务</h1>
-          <p className="text-kenya-dark/70">上传文本内容，配置认知画像</p>
+          <p className="text-kenya-dark/70">上传文本内容,开始认知结构提取</p>
         </div>
       </div>
 
@@ -157,64 +152,6 @@ export default function UploadPage() {
                   <span className="ml-2">✓</span>
                 )}
               </p>
-            </div>
-          </div>
-
-          {/* 认知画像配置 */}
-          <div className="kenya-card">
-            <h3 className="font-medium mb-2">认知画像配置</h3>
-            <p className="text-sm text-kenya-dark/60 mb-4">
-              配置 AI 如何理解和模拟这个人的思维方式，影响蒸馏输出的风格和深度
-            </p>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block mb-2 text-sm font-medium">阅读速度</label>
-                <select 
-                  className="kenya-input w-full"
-                  value={formData.cognitive_profile.reading_speed}
-                  onChange={(e) => setFormData({
-                    ...formData, 
-                    cognitive_profile: {...formData.cognitive_profile, reading_speed: e.target.value}
-                  })}
-                >
-                  <option value="slow">慢速（200字/分钟）- 适合深度理解</option>
-                  <option value="medium">中速（300字/分钟）- 平衡速度与理解</option>
-                  <option value="fast">快速（400字/分钟）- 快速浏览要点</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block mb-2 text-sm font-medium">专注时长</label>
-                <select 
-                  className="kenya-input w-full"
-                  value={formData.cognitive_profile.focus_duration}
-                  onChange={(e) => setFormData({
-                    ...formData, 
-                    cognitive_profile: {...formData.cognitive_profile, focus_duration: e.target.value}
-                  })}
-                >
-                  <option value="short">短时（5-10分钟）- 碎片化阅读</option>
-                  <option value="medium">中等（15-20分钟）- 常规阅读</option>
-                  <option value="long">长时（30分钟以上）- 深度学习</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block mb-2 text-sm font-medium">偏好深度</label>
-                <select 
-                  className="kenya-input w-full"
-                  value={formData.cognitive_profile.preferred_depth}
-                  onChange={(e) => setFormData({
-                    ...formData, 
-                    cognitive_profile: {...formData.cognitive_profile, preferred_depth: e.target.value}
-                  })}
-                >
-                  <option value="shallow">浅层（快速浏览）- 只要核心观点</option>
-                  <option value="medium">中等（理解要点）- 理解主要内容</option>
-                  <option value="deep">深度（完整掌握）- 全面理解细节</option>
-                </select>
-              </div>
             </div>
           </div>
 

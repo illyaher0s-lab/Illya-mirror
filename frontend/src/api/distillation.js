@@ -41,7 +41,6 @@ export const distillationAPI = {
     const payload = {
       name: data.title,
       raw_text: data.content,
-      // cognitive_profile 暂时不传，后端不需要
     };
     
     return request('/distillations', {
