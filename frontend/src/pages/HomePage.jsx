@@ -17,7 +17,8 @@ export default function HomePage() {
       setLoading(true);
       setError('');
       const data = await distillationAPI.list();
-      setTasks(data);
+      // API 返回 { total, items, skip, limit }，我们需要 items
+      setTasks(data.items || []);
     } catch (err) {
       setError('加载任务列表失败');
       console.error('Failed to fetch tasks:', err);
