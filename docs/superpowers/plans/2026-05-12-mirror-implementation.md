@@ -18,10 +18,10 @@
 - Create: `backend/main.py`, `backend/requirements.txt`, `backend/.env.example`
 - Create: `backend/app/__init__.py`, `backend/app/config.py`
 
-- [ ] 创建FastAPI项目结构
-- [ ] 安装依赖：`fastapi uvicorn sqlalchemy psycopg2-binary anthropic google-generativeai python-dotenv`
-- [ ] 配置环境变量（数据库URL、API keys）
-- [ ] 测试启动：`uvicorn app.main:app --reload`
+- [x] 创建FastAPI项目结构
+- [x] 安装依赖：`fastapi uvicorn sqlalchemy psycopg2-binary anthropic google-generativeai python-dotenv`
+- [x] 配置环境变量（数据库URL、API keys）
+- [x] 测试启动：`uvicorn app.main:app --reload`
 
 ### Task 2: 数据库设计
 
@@ -29,11 +29,11 @@
 - Create: `backend/app/models.py`, `backend/app/database.py`
 - Create: `backend/alembic.ini`, `backend/alembic/env.py`
 
-- [ ] 定义SQLAlchemy模型（distillations, contents, cognitive_profiles, quality_reports）
-- [ ] 配置Alembic迁移
-- [ ] 生成初始迁移：`alembic revision --autogenerate -m "initial"`
-- [ ] 执行迁移：`alembic upgrade head`
-- [ ] 验证表创建：`psql -d mirror -c "\dt"`
+- [x] 定义SQLAlchemy模型（distillations, contents, cognitive_profiles, quality_reports）
+- [x] 配置Alembic迁移
+- [x] 生成初始迁移：`alembic revision --autogenerate -m "initial"`
+- [x] 执行迁移：`alembic upgrade head`
+- [x] 验证表创建：`psql -d mirror -c "\dt"`
 
 ### Task 3: 基础API端点
 
@@ -41,42 +41,69 @@
 - Create: `backend/app/routers/distillations.py`
 - Create: `backend/app/schemas.py`
 
-- [ ] 实现CRUD端点（POST /api/distillations, GET /api/distillations, GET /api/distillations/{id}, DELETE /api/distillations/{id}）
-- [ ] Pydantic schemas定义
-- [ ] 测试API：`curl -X POST http://localhost:8000/api/distillations -d '{"name":"test","raw_text":"..."}'`
+- [x] 实现CRUD端点（POST /api/distillations, GET /api/distillations, GET /api/distillations/{id}, DELETE /api/distillations/{id}）
+- [x] Pydantic schemas定义
+- [x] 测试API：`curl -X POST http://localhost:8000/api/distillations -d '{"name":"test","raw_text":"..."}'`
 
-### Task 4: Gemini压缩模块
+### Task 4: 三层分段蒸馏设计（已完成）
 
-**Files:**
-- Create: `backend/app/services/gemini_compressor.py`
-- Create: `backend/app/prompts/compression_prompt.py`
+**Status:** ✅ 已完成
 
-- [ ] 设计压缩Prompt（主题聚类 + 关键段落提取）
-- [ ] 实现Gemini API调用（google-generativeai）
-- [ ] 测试压缩：用10万字文本测试，验证输出是否压缩到2-3万字
-- [ ] 错误处理（API限流、超时）
-
-### Task 5: Claude蒸馏模块
+**实现方式：** 三层串行请求 + 分段交付 + 缓存机制
 
 **Files:**
-- Create: `backend/app/services/claude_distiller.py`
-- Create: `backend/app/prompts/distillation_prompts.py`
+- Created: `docs/prompts/layer1.md` - 底层假设提取 + 段落索引构建
+- Created: `docs/prompts/layer2.md` - 推理规则提取
+- Created: `docs/prompts/layer3.md` - 表达策略分析
+- Created: `docs/three-layer-staged-distillation.md` - 完整设计文档
 
-- [ ] 设计三层蒸馏Prompt（认知层、表达层、互动层）
-- [ ] 实现Claude API调用（anthropic SDK）
-- [ ] 实现JSON schema验证（确保输出格式正确）
-- [ ] 测试蒸馏：用压缩后的文本测试，验证三层结构完整性
+**核心设计：**
+- 请求1：提取底层假设 + 构建paragraph_index（包含段落类型标注和完整原文）
+- 请求2：基于请求1的paragraph_index提取推理规则（不重新扫描原文）
+- 请求3：基于请求1+2的输出提取表达策略（不重新扫描原文）
+- 每层完成后等待用户确认，支持中途叫停
+- 描述型段落的full_text为null，节省20-30% token
 
-### Task 6: 蒸馏流程串联
+**测试结果：**
+- 单段落测试文本成功完成三层蒸馏
+- 提取3条底层假设、1条推理规则、4条表达策略
+- Claude诚实标注数据量限制，未编造规则
+
+### Task 5: Claude蒸馏模块（已完成）
+
+**Status:** ✅ 已完成
 
 **Files:**
-- Modify: `backend/app/routers/distillations.py`
-- Create: `backend/app/services/distillation_pipeline.py`
+- Created: `backend/app/services/claude_distiller.py` - Claude API调用（支持自定义base_url）
+- Created: `backend/app/services/distillation_engine.py` - 后台任务引擎
+- Created: `backend/app/routers/distillation_control.py` - 控制API端点
+- Modified: `backend/app/models.py` - 增加layer1/2/3_result和current_layer字段
+- Created: `backend/alembic/versions/73c95fab5e99_add_layer_results_and_current_layer.py` - 数据库迁移
 
-- [ ] 实现后台任务（FastAPI BackgroundTasks）
-- [ ] 流程：接收文本 → Gemini压缩 → Claude蒸馏 → 保存结果
-- [ ] 状态更新（pending → processing → completed/failed）
-- [ ] 端到端测试：提交任务 → 轮询状态 → 获取结果
+**实现功能：**
+- [x] 三层Prompt加载（从docs/prompts/读取）
+- [x] Claude API调用（支持中转API的base_url配置）
+- [x] JSON解析（支持```json代码块和纯文本）
+- [x] 后台线程任务（分段执行，状态机管理）
+- [x] 缓存机制（layer1/2/3_result存储，失败重试不重跑已完成层）
+- [x] 分段交付API：
+  - POST /api/distillations/{id}/continue - 继续下一层
+  - POST /api/distillations/{id}/stop - 叫停任务
+  - GET /api/distillations/{id}/status - 查询实时状态
+  - GET /api/distillations/{id}/layer1 - 查看请求1结果
+  - GET /api/distillations/{id}/layer2 - 查看请求2结果
+  - GET /api/distillations/{id}/layer3 - 查看请求3结果
+
+**测试结果：**
+- 中转API调用成功（base_url: https://cc-vibe.com）
+- 三层蒸馏完整流程通过
+- 分段交付和缓存机制正常工作
+
+### Task 6: 蒸馏流程串联（已完成）
+
+**Status:** ✅ 已完成（三层分段蒸馏）
+
+**Note:** 原计划的"Gemini压缩 → Claude蒸馏"流程已调整为"三层分段蒸馏"。Gemini压缩模块暂未实现，当前直接使用compressed_text字段作为输入。
 
 ---
 
