@@ -125,13 +125,29 @@ def _distillation_worker(distillation_id: str):
             layer3_result = extract_layer3(layer1_result, layer2_result)
             
             distillation.layer3_result = layer3_result
-            distillation.current_layer = "completed"
-            distillation.status = "completed"
+            distillation.current_layer = "layer3_done"
             db.commit()
         except Exception as e:
             distillation.status = "failed"
             distillation.error_message = f"Layer 3 failed: {str(e)}"
             distillation.current_layer = "layer3_failed"
+            db.commit()
+            return
+        
+        # ===== Generate Quality Report =====
+        distillation.current_layer = "generating_report"
+        db.commit()
+        
+        try:
+            _generate_quality_report(db, distillation)
+            
+            distillation.current_layer = "completed"
+            distillation.status = "completed"
+            db.commit()
+        except Exception as e:
+            distillation.status = "failed"
+            distillation.error_message = f"Quality report generation failed: {str(e)}"
+            distillation.current_layer = "report_failed"
             db.commit()
             return
         
@@ -141,3 +157,60 @@ def _distillation_worker(distillation_id: str):
         db.commit()
     finally:
         db.close()
+
+
+def _generate_quality_report(db: Session, distillation: Distillation):
+    """
+    Generate quality report after layer3 completion.
+    """
+    from app.services.quality_evaluator import QualityEvaluator
+    from app.services.report_generator import ReportGenerator
+    from app.models import QualityReport
+    import asyncio
+    
+    evaluator = QualityEvaluator()
+    generator = ReportGenerator()
+    
+    layer1 = distillation.layer1_result or {}
+    layer2 = distillation.layer2_result or {}
+    layer3 = distillation.layer3_result or {}
+    
+    # Coverage analysis
+    coverage = evaluator.analyze_coverage(layer1, layer2, layer3)
+    
+    # Bad case detection (async call)
+    bad_cases = asyncio.run(evaluator.detect_bad_cases(layer1, layer2))
+    
+    # Overall score
+    overall_score = evaluator.calculate_overall_score(
+        layer1, layer2, layer3, coverage, bad_cases
+    )
+    
+    # Iteration suggestions
+    suggestions = evaluator.generate_iteration_suggestions(
+        coverage, bad_cases, overall_score
+    )
+    
+    # Generate markdown report
+    markdown_report = generator.generate_markdown_report(
+        distillation.name,
+        layer1, layer2, layer3,
+        overall_score, coverage, bad_cases, suggestions
+    )
+    
+    # Save to database
+    quality_report = QualityReport(
+        distillation_id=distillation.id,
+        overall_score=overall_score["score"],
+        rating=overall_score["rating"],
+        coverage_analysis=coverage,
+        confidence_analysis={
+            "breakdown": overall_score["breakdown"]
+        },
+        bad_cases=bad_cases,
+        iteration_suggestions=suggestions,
+        markdown_report=markdown_report
+    )
+    db.add(quality_report)
+    db.commit()
+    print(f"[{distillation.id}] Quality report generated and saved")

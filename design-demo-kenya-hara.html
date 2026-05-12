@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRROR - 认知数据提取引擎</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #B5A79A;
+            color: #2D2D2D;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header - 更白的米白色区域 */
+        .header {
+            background: #E8E3DC;
+            padding: 24px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #8B7D6F;
+        }
+
+        .brand {
+            font-size: 14px;
+            letter-spacing: 2px;
+            font-weight: 300;
+        }
+
+        .year {
+            font-size: 12px;
+            font-weight: 300;
+        }
+
+        /* Hero - 更白的米白色区域 */
+        .hero {
+            background: #E8E3DC;
+            padding: 60px 60px 40px;
+            position: relative;
+        }
+
+        .hero-title {
+            font-size: 80px;
+            font-weight: 300;
+            letter-spacing: -2px;
+            line-height: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .decorative-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 0;
+        }
+
+        .line {
+            background: #2D2D2D;
+            width: 100%;
+        }
+
+        .line:nth-child(1) {
+            height: 1px;
+        }
+
+        .line:nth-child(2) {
+            height: 2px;
+        }
+
+        .line:nth-child(3) {
+            height: 3px;
+        }
+
+        .line:nth-child(4) {
+            height: 4px;
+        }
+
+        .tagline-banner {
+            background: #2D2D2D;
+            color: #C9BDB1;
+            padding: 20px 30px;
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .arrow {
+            font-size: 24px;
+            font-weight: 200;
+        }
+
+        /* 装饰圆形 */
+        .hero-circle {
+            position: absolute;
+            right: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(212, 201, 190, 0.4);
+            pointer-events: none;
+        }
+
+        /* Main Content - 米棕色区域 */
+        .content {
+            padding: 60px 60px 80px;
+            position: relative;
+        }
+
+        .section-number {
+            font-size: 120px;
+            font-weight: 300;
+            position: absolute;
+            left: 60px;
+            top: 40px;
+            opacity: 0.1;
+            line-height: 1;
+        }
+
+        .cards-container {
+            margin-left: 160px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(45, 45, 45, 0.1);
+            padding: 30px;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 2px;
+            height: 100%;
+            background: #2D2D2D;
+            transition: left 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateX(15px);
+        }
+
+        .card:hover::before {
+            left: 0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .card-status {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border: 1px solid #2D2D2D;
+            background: transparent;
+            white-space: nowrap;
+        }
+
+        .card-meta {
+            font-size: 13px;
+            color: rgba(45, 45, 45, 0.6);
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            height: 2px;
+            background: rgba(45, 45, 45, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2D2D2D;
+            transition: width 0.6s ease;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            padding: 8px 20px;
+            border: 1px solid #2D2D2D;
+            background: transparent;
+            color: #2D2D2D;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #2D2D2D;
+            color: #C9BDB1;
+        }
+
+        .btn-primary {
+            background: #2D2D2D;
+            color: #C9BDB1;
+        }
+
+        .btn-primary:hover {
+            background: transparent;
+            color: #2D2D2D;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hero-title {
+                font-size: 60px;
+            }
+            .section-number {
+                font-size: 100px;
+            }
+            .cards-container {
+                margin-left: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header, .hero, .content {
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+            .hero-title {
+                font-size: 48px;
+            }
+            .tagline-banner {
+                font-size: 14px;
+                padding: 16px 20px;
+            }
+            .section-number {
+                font-size: 80px;
+                left: 30px;
+            }
+            .cards-container {
+                margin-left: 0;
+                margin-top: 100px;
+            }
+            .card {
+                padding: 24px;
+            }
+            .hero-circle {
+                width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">MIRROR</div>
+        <div class="year">©2026</div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-circle"></div>
+        <h1 class="hero-title">MIRROR</h1>
+        
+        <div class="decorative-lines">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+        </div>
+
+        <div class="tagline-banner">
+            <span>从非结构化文本中提取认知结构</span>
+            <span class="arrow">↓</span>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="content">
+        <div class="section-number">1</div>
+        
+        <div class="cards-container">
+            <!-- Card 1 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">认知模式提取 - 教育领域</h3>
+                    <span class="card-status">已完成</span>
+                </div>
+                <div class="card-meta">创建于 2026-05-10 · 3 篇文章 · 45,000 tokens</div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>进度</span>
+                        <span>100%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-primary">查看结果</button>
+                    <button class="btn">导出</button>
+                    <button class="btn">删除</button>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">表达策略分析 - 商业写作</h3>
+                    <span class="card-status">进行中</span>
+                </div>
+                <div class="card-meta">创建于 2026-05-11 · 5 篇文章 · 62,000 tokens</div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>第 2 层 / 共 3 层</span>
+                        <span>67%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 67%"></div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-primary">继续</button>
+                    <button class="btn">暂停</button>
+                    <button class="btn">停止</button>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">推理规则挖掘 - 技术文档</h3>
+                    <span class="card-status">待开始</span>
+                </div>
+                <div class="card-meta">创建于 2026-05-12 · 8 篇文章 · 98,000 tokens</div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>等待开始</span>
+                        <span>0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-primary">开始</button>
+                    <button class="btn">编辑</button>
+                    <button class="btn">删除</button>
+                </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">多维度认知图谱 - 心理学研究</h3>
+                    <span class="card-status">失败</span>
+                </div>
+                <div class="card-meta">创建于 2026-05-09 · 2 篇文章 · 28,000 tokens</div>
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>第 1 层出错</span>
+                        <span>15%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 15%; background: #8B4513;"></div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-primary">重试</button>
+                    <button class="btn">查看日志</button>
+                    <button class="btn">删除</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 页面加载后动画进度条
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.progress-fill').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

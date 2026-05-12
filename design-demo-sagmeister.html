@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mirror · Sagmeister风格Demo</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  background: #0a0a0a;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 80px 60px;
+}
+
+/* Hero区 - 超大字体 */
+.hero {
+  margin-bottom: 120px;
+  position: relative;
+}
+
+.hero h1 {
+  font-size: 180px;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #00ff88 0%, #00d4ff 50%, #ff00ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 24px;
+}
+
+.hero .subtitle {
+  font-size: 24px;
+  color: #666;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+/* 新建任务按钮 - 霓虹风格 */
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 60px;
+  padding: 32px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 0;
+  position: relative;
+}
+
+.action-bar::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
+  background: linear-gradient(135deg, #00ff88, #00d4ff, #ff00ff);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+  border-radius: 0;
+}
+
+.action-bar:hover::before {
+  opacity: 0.1;
+}
+
+.new-task-btn {
+  background: #00ff88;
+  color: #0a0a0a;
+  border: none;
+  padding: 20px 48px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+}
+
+.new-task-btn:hover {
+  background: #00d4ff;
+  box-shadow: 0 0 50px rgba(0, 212, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.filters {
+  display: flex;
+  gap: 16px;
+}
+
+.filter-btn {
+  background: transparent;
+  color: #666;
+  border: 1px solid #333;
+  padding: 12px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.filter-btn:hover,
+.filter-btn.active {
+  color: #00ff88;
+  border-color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+/* 任务卡片 - 不对称布局 */
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+}
+
+.task-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid transparent;
+  padding: 48px;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.task-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(180deg, #00ff88, #00d4ff);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.task-card:hover::before {
+  opacity: 1;
+}
+
+.task-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 255, 136, 0.3);
+  transform: translateX(8px);
+}
+
+/* 任务编号 - 超大装饰 */
+.task-number {
+  position: absolute;
+  top: -40px;
+  right: 20px;
+  font-size: 200px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.02);
+  line-height: 1;
+  pointer-events: none;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.task-name {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.task-status {
+  display: inline-block;
+  padding: 8px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+
+.status-pending {
+  background: rgba(255, 255, 255, 0.1);
+  color: #666;
+  border: 1px solid #333;
+}
+
+.status-processing {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  border: 1px solid #00d4ff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.status-completed {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  border: 1px solid #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+/* 进度条 - 霓虹风格 */
+.task-progress {
+  margin-bottom: 24px;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.progress-bar-container {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #00d4ff);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.task-meta {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+  font-size: 14px;
+  color: #666;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+}
+
+.meta-value {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* 操作按钮 */
+.task-actions {
+  display: flex;
+  gap: 16px;
+}
+
+.action-btn {
+  flex: 1;
+  padding: 16px;
+  background: transparent;
+  border: 1px solid #333;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.action-btn:hover {
+  border-color: #00ff88;
+  color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+}
+
+.action-btn.danger:hover {
+  border-color: #ff00ff;
+  color: #ff00ff;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+}
+
+/* 空状态 */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 120px 40px;
+}
+
+.empty-state h3 {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #00ff88, #00d4ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.empty-state p {
+  font-size: 18px;
+  color: #666;
+  letter-spacing: 0.05em;
+}
+
+/* 几何装饰元素 */
+.geometric-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.03;
+}
+
+.geometric-bg::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  width: 400px;
+  height: 400px;
+  background: linear-gradient(135deg, #00ff88, #00d4ff);
+  border-radius: 50%;
+  filter: blur(100px);
+}
+
+.geometric-bg::after {
+  content: '';
+  position: absolute;
+  bottom: 20%;
+  left: 10%;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(135deg, #ff00ff, #00d4ff);
+  border-radius: 50%;
+  filter: blur(100px);
+}
+</style>
+</head>
+<body>
+
+<div class="geometric-bg"></div>
+
+<div class="container">
+  <!-- Hero区 -->
+  <div class="hero">
+    <h1>MIRROR</h1>
+    <div class="subtitle">Cognitive Distillation Engine</div>
+  </div>
+
+  <!-- 操作栏 -->
+  <div class="action-bar">
+    <button class="new-task-btn">+ New Task</button>
+    <div class="filters">
+      <button class="filter-btn active">All</button>
+      <button class="filter-btn">Processing</button>
+      <button class="filter-btn">Completed</button>
+    </div>
+  </div>
+
+  <!-- 任务列表 -->
+  <div class="tasks-grid">
+    <!-- 任务1 -->
+    <div class="task-card">
+      <div class="task-number">01</div>
+      <div class="task-header">
+        <div>
+          <h3 class="task-name">张三访谈记录</h3>
+        </div>
+        <span class="task-status status-completed">Completed</span>
+      </div>
+      
+      <div class="task-progress">
+        <div class="progress-label">
+          <span>Layer 3/3</span>
+          <span>100%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: 100%"></div>
+        </div>
+      </div>
+
+      <div class="task-meta">
+        <div class="meta-item">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">2026-05-10</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Duration</span>
+          <span class="meta-value">12m 34s</span>
+        </div>
+      </div>
+
+      <div class="task-actions">
+        <button class="action-btn">View Results</button>
+        <button class="action-btn danger">Delete</button>
+      </div>
+    </div>
+
+    <!-- 任务2 -->
+    <div class="task-card">
+      <div class="task-number">02</div>
+      <div class="task-header">
+        <div>
+          <h3 class="task-name">产品需求文档</h3>
+        </div>
+        <span class="task-status status-processing">Processing</span>
+      </div>
+      
+      <div class="task-progress">
+        <div class="progress-label">
+          <span>Layer 2/3</span>
+          <span>67%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: 67%"></div>
+        </div>
+      </div>
+
+      <div class="task-meta">
+        <div class="meta-item">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">2026-05-11</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Elapsed</span>
+          <span class="meta-value">8m 12s</span>
+        </div>
+      </div>
+
+      <div class="task-actions">
+        <button class="action-btn">View Progress</button>
+        <button class="action-btn">Stop</button>
+      </div>
+    </div>
+
+    <!-- 任务3 -->
+    <div class="task-card">
+      <div class="task-number">03</div>
+      <div class="task-header">
+        <div>
+          <h3 class="task-name">技术博客合集</h3>
+        </div>
+        <span class="task-status status-pending">Pending</span>
+      </div>
+      
+      <div class="task-progress">
+        <div class="progress-label">
+          <span>Layer 0/3</span>
+          <span>0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="task-meta">
+        <div class="meta-item">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">2026-05-12</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Status</span>
+          <span class="meta-value">Queued</span>
+        </div>
+      </div>
+
+      <div class="task-actions">
+        <button class="action-btn">Start</button>
+        <button class="action-btn danger">Delete</button>
+      </div>
+    </div>
+
+    <!-- 任务4 -->
+    <div class="task-card">
+      <div class="task-number">04</div>
+      <div class="task-header">
+        <div>
+          <h3 class="task-name">用户研究报告</h3>
+        </div>
+        <span class="task-status status-completed">Completed</span>
+      </div>
+      
+      <div class="task-progress">
+        <div class="progress-label">
+          <span>Layer 3/3</span>
+          <span>100%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: 100%"></div>
+        </div>
+      </div>
+
+      <div class="task-meta">
+        <div class="meta-item">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">2026-05-09</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Duration</span>
+          <span class="meta-value">15m 48s</span>
+        </div>
+      </div>
+
+      <div class="task-actions">
+        <button class="action-btn">View Results</button>
+        <button class="action-btn danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

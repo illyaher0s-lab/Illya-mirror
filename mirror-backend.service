@@ -1,0 +1,19 @@
+[Unit]
+Description=Mirror FastAPI Backend
+After=network.target postgresql.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/mirror/backend
+ExecStart=/home/ubuntu/mirror/backend/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=10
+
+# 日志
+StandardOutput=append:/var/log/mirror-backend.log
+StandardError=append:/var/log/mirror-backend-error.log
+
+[Install]
+WantedBy=multi-user.target

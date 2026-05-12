@@ -134,3 +134,77 @@ async def delete_distillation(
     db.commit()
     
     return None
+
+
+@router.get("/distillations/{distillation_id}/quality")
+async def get_quality_report(
+    distillation_id: UUID,
+    db: Session = Depends(get_db)
+):
+    """
+    Get quality report for a distillation task.
+    
+    - **distillation_id**: UUID of the distillation task
+    """
+    from app.models import QualityReport
+    
+    report = db.query(QualityReport).filter(QualityReport.distillation_id == distillation_id).first()
+    if not report:
+        raise HTTPException(status_code=404, detail="Quality report not found")
+    
+    return report
+
+
+@router.get("/distillations/{distillation_id}/export")
+async def export_distillation(
+    distillation_id: UUID,
+    format: str = Query("json", description="Export format: json, yaml, or markdown"),
+    db: Session = Depends(get_db)
+):
+    """
+    Export distillation results in various formats.
+    
+    - **distillation_id**: UUID of the distillation task
+    - **format**: Export format (json, yaml, markdown)
+    """
+    distillation = db.query(Distillation).filter(Distillation.id == distillation_id).first()
+    if not distillation:
+        raise HTTPException(status_code=404, detail="Distillation not found")
+    
+    if format == "json":
+        from fastapi.responses import JSONResponse
+        data = {
+            "name": distillation.name,
+            "created_at": distillation.created_at.isoformat(),
+            "layer1": distillation.layer1_result,
+            "layer2": distillation.layer2_result,
+            "layer3": distillation.layer3_result
+        }
+        return JSONResponse(content=data)
+    
+    elif format == "yaml":
+        import yaml
+        from fastapi.responses import Response
+        data = {
+            "name": distillation.name,
+            "created_at": distillation.created_at.isoformat(),
+            "layer1": distillation.layer1_result,
+            "layer2": distillation.layer2_result,
+            "layer3": distillation.layer3_result
+        }
+        yaml_content = yaml.dump(data, allow_unicode=True, default_flow_style=False)
+        return Response(content=yaml_content, media_type="text/yaml")
+    
+    elif format == "markdown":
+        from fastapi.responses import Response
+        from app.models import QualityReport
+        
+        report = db.query(QualityReport).filter(QualityReport.distillation_id == distillation_id).first()
+        if not report:
+            raise HTTPException(status_code=404, detail="Quality report not found")
+        
+        return Response(content=report.markdown_report, media_type="text/markdown")
+    
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported format. Use json, yaml, or markdown")
+
