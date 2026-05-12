@@ -105,7 +105,7 @@ export default function HomePage() {
             镜像
           </h1>
           <p className="text-lg text-kenya-dark/70">
-            知识蒸馏工具 — 将长文本压缩为认知友好的结构化内容
+            从非结构化文本中提取认知结构，让 AI 理解一个人的思维方式
           </p>
         </div>
       </div>

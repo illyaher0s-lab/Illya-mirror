@@ -164,7 +164,7 @@ export default function UploadPage() {
           <div className="kenya-card">
             <h3 className="font-medium mb-2">认知画像配置</h3>
             <p className="text-sm text-kenya-dark/60 mb-4">
-              根据你的阅读习惯和需求，调整蒸馏输出的风格和深度
+              配置 AI 如何理解和模拟这个人的思维方式，影响蒸馏输出的风格和深度
             </p>
             
             <div className="space-y-4">
