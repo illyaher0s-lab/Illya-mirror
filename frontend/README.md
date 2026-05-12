@@ -63,19 +63,17 @@ npm run build
 npm run preview
 ```
 
-## 当前状态（Task 11 完成）
+## 当前状态（Task 11-16 已完成）
 
 ✅ 已完成：
 - Vite + React 项目初始化
 - Tailwind CSS v4 配置
 - Kenya Hara 设计风格转换为全局 CSS
-- 四个页面的基础 UI 实现
+- 四个页面完整实现（首页、上传、进度、结果）
 - React Router 路由配置
-- 开发服务器启动（端口 5173）
-
-⏳ 待完成（Task 12-16）：
-- Task 12-15: 完善各页面的交互逻辑和 UI 细节
-- Task 16: 前端 API 集成（连接后端 8000 端口）
+- 前端 API 集成（连接后端 8000 端口）
+- 生产构建完成（dist 目录）
+- 已部署到生产环境（http://43.128.11.119）
 
 ## 注意事项
 
@@ -84,9 +82,9 @@ npm run preview
    - 需要安装 `@tailwindcss/postcss` 包
 
 2. **API 集成**：
-   - 当前页面使用模拟数据
-   - Task 16 会实现真实的 API 调用
-   - 后端地址: `http://localhost:8000/api`
+   - 已集成真实 API
+   - 生产环境后端地址: `http://43.128.11.119:8000/api`
+   - 开发环境后端地址: `http://localhost:8000/api`
 
 3. **设计规范**：
    - 禁止使用 `backdrop-filter` 和 `box-shadow`
