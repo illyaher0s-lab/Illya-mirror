@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { distillationAPI } from '../api/distillation';
+import toast from 'react-hot-toast';
+import api from '../utils/api';
 
 export default function HomePage() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [filter, setFilter] = useState('all'); // all, processing, completed, failed
 
   useEffect(() => {
@@ -15,13 +15,12 @@ export default function HomePage() {
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      setError('');
-      const data = await distillationAPI.list();
+      const data = await api.getTasks();
       // API 返回 { total, items, skip, limit }，我们需要 items
       setTasks(data.items || []);
     } catch (err) {
-      setError('加载任务列表失败');
       console.error('Failed to fetch tasks:', err);
+      // 错误已经由 api.js 显示 toast，这里不需要重复
     } finally {
       setLoading(false);
     }
@@ -94,16 +93,15 @@ export default function HomePage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('确定要删除这个任务吗？')) {
-      return;
-    }
-
+    if (!window.confirm('确定要删除这个任务吗？')) return;
+    
     try {
-      await distillationAPI.delete(id);
+      await api.deleteTask(id);
       setTasks(tasks.filter(task => task.id !== id));
+      toast.success('任务已删除');
     } catch (err) {
-      setError('删除任务失败');
       console.error('Failed to delete task:', err);
+      // 错误已经由 api.js 显示 toast
     }
   };
 
@@ -141,13 +139,6 @@ export default function HomePage() {
             </button>
           </Link>
         </div>
-
-        {/* 错误提示 */}
-        {error && (
-          <div className="kenya-card bg-red-50 border-l-4 border-red-500 mb-6">
-            <p className="text-red-700">{error}</p>
-          </div>
-        )}
 
         {/* 筛选器 */}
         {tasks.length > 0 && (

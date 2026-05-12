@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { distillationAPI } from '../api/distillation';
+import toast from 'react-hot-toast';
+import api from '../utils/api';
 
 export default function UploadPage() {
   const navigate = useNavigate();
@@ -9,7 +10,6 @@ export default function UploadPage() {
     content: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const wordCount = formData.content.length;
   const isValidLength = wordCount >= 1000 && wordCount <= 50000;
@@ -34,38 +34,42 @@ export default function UploadPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     // 表单验证
     if (!formData.title.trim()) {
-      setError('请输入任务标题');
+      toast.error('请输入任务标题');
       return;
     }
 
     if (!formData.content.trim()) {
-      setError('请输入或上传文本内容');
+      toast.error('请输入或上传文本内容');
       return;
     }
 
     if (wordCount < 1000) {
-      setError('文本内容至少需要 1000 字');
+      toast.error('文本内容至少需要 1000 字');
       return;
     }
 
     if (wordCount > 50000) {
-      setError('文本内容不能超过 50000 字');
+      toast.error('文本内容不能超过 50000 字');
       return;
     }
 
     setLoading(true);
 
     try {
-      const result = await distillationAPI.create(formData);
+      const result = await api.createTask({
+        name: formData.title,
+        raw_text: formData.content
+      });
+      toast.success('任务创建成功！');
       // 创建成功，跳转到进度页
       navigate(`/progress/${result.id}`);
     } catch (err) {
-      setError(err.message || '创建任务失败，请重试');
+      console.error('Failed to create task:', err);
       setLoading(false);
+      // 错误已经由 api.js 显示 toast
     }
   };
 
