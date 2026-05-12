@@ -20,7 +20,9 @@ class DistillationResponse(BaseModel):
     id: UUID
     name: str
     status: str
+    current_layer: Optional[str] = None
     quality_score: Optional[str] = None
+    error_message: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
