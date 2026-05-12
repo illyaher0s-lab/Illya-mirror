@@ -37,9 +37,16 @@ async function request(endpoint, options = {}) {
 export const distillationAPI = {
   // 创建任务
   create: async (data) => {
+    // 映射前端字段到后端字段
+    const payload = {
+      name: data.title,
+      raw_text: data.content,
+      // cognitive_profile 暂时不传，后端不需要
+    };
+    
     return request('/distillations', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
   },
 
