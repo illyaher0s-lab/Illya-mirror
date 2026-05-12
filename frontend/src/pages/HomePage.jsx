@@ -26,39 +26,57 @@ export default function HomePage() {
     }
   };
 
-  const getStatusText = (status) => {
-    const statusMap = {
-      'pending': '等待中',
-      'layer1_processing': '第一层处理中',
-      'layer1_completed': '第一层完成',
-      'layer2_processing': '第二层处理中',
-      'layer2_completed': '第二层完成',
-      'layer3_processing': '第三层处理中',
-      'completed': '已完成',
-      'failed': '失败',
-      'stopped': '已停止',
-    };
-    return statusMap[status] || status;
+  const getStatusText = (status, currentLayer) => {
+    // 压缩阶段
+    if (currentLayer === 'compressing') return '文本压缩中';
+    if (currentLayer === 'compression_failed') return '压缩失败';
+    
+    // 三层蒸馏阶段
+    if (currentLayer === 'layer1_running') return '第一层处理中';
+    if (currentLayer === 'layer1_done') return '第一层完成';
+    if (currentLayer === 'layer1_failed') return '第一层失败';
+    if (currentLayer === 'layer2_running') return '第二层处理中';
+    if (currentLayer === 'layer2_done') return '第二层完成';
+    if (currentLayer === 'layer2_failed') return '第二层失败';
+    if (currentLayer === 'layer3_running') return '第三层处理中';
+    if (currentLayer === 'layer3_done') return '第三层完成';
+    if (currentLayer === 'layer3_failed') return '第三层失败';
+    
+    // 通用状态
+    if (status === 'completed') return '已完成';
+    if (status === 'failed') return '失败';
+    if (status === 'stopped') return '已停止';
+    if (status === 'pending') return '等待中';
+    
+    return status;
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status, currentLayer) => {
     if (status === 'completed') return 'bg-green-100 text-green-800';
-    if (status === 'failed') return 'bg-red-100 text-red-800';
+    if (status === 'failed' || currentLayer?.includes('failed')) return 'bg-red-100 text-red-800';
     if (status === 'stopped') return 'bg-gray-100 text-gray-800';
-    if (status.includes('processing')) return 'bg-blue-100 text-blue-800';
-    return 'bg-yellow-100 text-yellow-800';
+    if (currentLayer?.includes('running') || currentLayer === 'compressing') return 'bg-blue-100 text-blue-800';
+    if (currentLayer?.includes('done')) return 'bg-yellow-100 text-yellow-800';
+    return 'bg-gray-100 text-gray-800';
   };
 
   const getProgressPercentage = (status, currentLayer) => {
     if (status === 'completed') return 100;
     if (status === 'failed' || status === 'stopped') return 0;
     
-    const layerProgress = {
-      1: 33,
-      2: 66,
-      3: 100,
-    };
-    return layerProgress[currentLayer] || 0;
+    // 压缩阶段 10%
+    if (currentLayer === 'compressing') return 10;
+    if (currentLayer === 'compression_failed') return 0;
+    
+    // 三层蒸馏：每层 30%
+    if (currentLayer === 'layer1_running') return 25;
+    if (currentLayer === 'layer1_done') return 30;
+    if (currentLayer === 'layer2_running') return 55;
+    if (currentLayer === 'layer2_done') return 60;
+    if (currentLayer === 'layer3_running') return 85;
+    if (currentLayer === 'layer3_done') return 90;
+    
+    return 0;
   };
 
   const formatDate = (dateString) => {
@@ -90,7 +108,9 @@ export default function HomePage() {
 
   const filteredTasks = tasks.filter(task => {
     if (filter === 'all') return true;
-    if (filter === 'processing') return task.status.includes('processing');
+    if (filter === 'processing') {
+      return task.current_layer?.includes('running') || task.current_layer === 'compressing';
+    }
     if (filter === 'completed') return task.status === 'completed';
     if (filter === 'failed') return task.status === 'failed' || task.status === 'stopped';
     return true;
@@ -149,7 +169,7 @@ export default function HomePage() {
                   : 'bg-white/50 hover:bg-white/70'
               }`}
             >
-              处理中 ({tasks.filter(t => t.status.includes('processing')).length})
+              处理中 ({tasks.filter(t => t.current_layer?.includes('running') || t.current_layer === 'compressing').length})
             </button>
             <button
               onClick={() => setFilter('completed')}
