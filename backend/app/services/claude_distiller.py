@@ -102,7 +102,14 @@ def extract_layer1(compressed_text: str) -> dict:
     else:
         json_text = response_text.strip()
     
-    return json.loads(json_text)
+    try:
+        return json.loads(json_text)
+    except json.JSONDecodeError as e:
+        # Save raw response for debugging
+        error_msg = f"JSON parse error at line {e.lineno} col {e.colno}: {e.msg}"
+        print(f"[Layer 1] {error_msg}")
+        print(f"[Layer 1] Raw response (first 500 chars): {json_text[:500]}")
+        raise ValueError(f"{error_msg}. Check logs for full response.")
 
 
 def extract_layer2(layer1_result: dict) -> dict:
@@ -143,7 +150,13 @@ def extract_layer2(layer1_result: dict) -> dict:
     else:
         json_text = response_text.strip()
     
-    return json.loads(json_text)
+    try:
+        return json.loads(json_text)
+    except json.JSONDecodeError as e:
+        error_msg = f"JSON parse error at line {e.lineno} col {e.colno}: {e.msg}"
+        print(f"[Layer 2] {error_msg}")
+        print(f"[Layer 2] Raw response (first 500 chars): {json_text[:500]}")
+        raise ValueError(f"{error_msg}. Check logs for full response.")
 
 
 def extract_layer3(layer1_result: dict, layer2_result: dict) -> dict:
@@ -190,4 +203,10 @@ def extract_layer3(layer1_result: dict, layer2_result: dict) -> dict:
     else:
         json_text = response_text.strip()
     
-    return json.loads(json_text)
+    try:
+        return json.loads(json_text)
+    except json.JSONDecodeError as e:
+        error_msg = f"JSON parse error at line {e.lineno} col {e.colno}: {e.msg}"
+        print(f"[Layer 3] {error_msg}")
+        print(f"[Layer 3] Raw response (first 500 chars): {json_text[:500]}")
+        raise ValueError(f"{error_msg}. Check logs for full response.")
