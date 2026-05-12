@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { distillationAPI } from '../api/distillation';
 
 export default function UploadPage() {
   const navigate = useNavigate();
@@ -64,17 +65,11 @@ export default function UploadPage() {
     setLoading(true);
 
     try {
-      // TODO: Task 16 会替换为真实 API 调用
-      console.log('提交数据:', formData);
-      
-      // 模拟 API 延迟
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // 模拟创建成功，跳转到进度页
-      const mockTaskId = Math.floor(Math.random() * 1000);
-      navigate(`/progress/${mockTaskId}`);
+      const result = await distillationAPI.create(formData);
+      // 创建成功，跳转到进度页
+      navigate(`/progress/${result.id}`);
     } catch (err) {
-      setError('创建任务失败，请重试');
+      setError(err.message || '创建任务失败，请重试');
       setLoading(false);
     }
   };

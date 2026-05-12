@@ -1,44 +1,30 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { distillationAPI } from '../api/distillation';
 
 export default function HomePage() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [filter, setFilter] = useState('all'); // all, processing, completed, failed
 
-  // TODO: Task 16 会替换为真实 API 调用
   useEffect(() => {
-    // 模拟 API 加载
-    setTimeout(() => {
-      setTasks([
-        {
-          id: 1,
-          title: '《认知觉醒》读书笔记蒸馏',
-          status: 'completed',
-          current_layer: 3,
-          created_at: '2026-05-12T10:30:00',
-          updated_at: '2026-05-12T11:45:00',
-        },
-        {
-          id: 2,
-          title: 'AI 产品设计方法论长文',
-          status: 'layer2_processing',
-          current_layer: 2,
-          created_at: '2026-05-12T14:20:00',
-          updated_at: '2026-05-12T14:35:00',
-        },
-        {
-          id: 3,
-          title: '神经网络基础教程',
-          status: 'layer1_completed',
-          current_layer: 1,
-          created_at: '2026-05-11T16:00:00',
-          updated_at: '2026-05-11T16:15:00',
-        },
-      ]);
-      setLoading(false);
-    }, 500);
+    fetchTasks();
   }, []);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const data = await distillationAPI.list();
+      setTasks(data);
+    } catch (err) {
+      setError('加载任务列表失败');
+      console.error('Failed to fetch tasks:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusText = (status) => {
     const statusMap = {
@@ -88,10 +74,17 @@ export default function HomePage() {
     return `${days} 天前`;
   };
 
-  const handleDelete = (id) => {
-    if (confirm('确定要删除这个任务吗？')) {
-      // TODO: Task 16 会调用删除 API
+  const handleDelete = async (id) => {
+    if (!confirm('确定要删除这个任务吗？')) {
+      return;
+    }
+
+    try {
+      await distillationAPI.delete(id);
       setTasks(tasks.filter(task => task.id !== id));
+    } catch (err) {
+      setError('删除任务失败');
+      console.error('Failed to delete task:', err);
     }
   };
 
@@ -127,6 +120,13 @@ export default function HomePage() {
             </button>
           </Link>
         </div>
+
+        {/* 错误提示 */}
+        {error && (
+          <div className="kenya-card bg-red-50 border-l-4 border-red-500 mb-6">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
 
         {/* 筛选器 */}
         {tasks.length > 0 && (

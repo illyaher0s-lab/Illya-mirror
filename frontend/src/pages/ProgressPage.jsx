@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { distillationAPI } from '../api/distillation';
 
 export default function ProgressPage() {
   const { id } = useParams();
@@ -10,39 +11,16 @@ export default function ProgressPage() {
   const [error, setError] = useState('');
   const [polling, setPolling] = useState(true);
 
-  // 模拟实时轮询
+  // 实时轮询
   useEffect(() => {
     const fetchTaskStatus = async () => {
       try {
-        // TODO: Task 16 会替换为真实 API 调用
-        // const response = await fetch(`/api/distillations/${id}/status`);
-        // const data = await response.json();
-        
-        // 模拟数据
-        const mockData = {
-          id: parseInt(id),
-          title: 'AI 产品设计方法论长文',
-          status: 'layer2_processing',
-          current_layer: 2,
-          layer1_result: {
-            paragraph_count: 45,
-            completed_at: '2026-05-12T14:25:00'
-          },
-          layer2_result: null,
-          layer3_result: null,
-          created_at: '2026-05-12T14:20:00',
-          updated_at: '2026-05-12T14:30:00',
-          progress_detail: {
-            current_step: '正在提取核心概念...',
-            percentage: 65
-          }
-        };
-        
-        setTaskData(mockData);
+        const data = await distillationAPI.get(id);
+        setTaskData(data);
         setLoading(false);
         
         // 如果任务完成或失败，停止轮询
-        if (mockData.status === 'completed' || mockData.status === 'failed' || mockData.status === 'stopped') {
+        if (data.status === 'completed' || data.status === 'failed' || data.status === 'stopped') {
           setPolling(false);
         }
       } catch (err) {
@@ -76,16 +54,8 @@ export default function ProgressPage() {
 
   const handleContinue = async () => {
     try {
-      // TODO: Task 16 会调用 API
-      // await fetch(`/api/distillations/${id}/continue`, { method: 'POST' });
-      console.log('继续下一层');
-      
-      // 模拟继续下一层
-      setTaskData(prev => ({
-        ...prev,
-        status: `layer${prev.current_layer + 1}_processing`,
-        current_layer: prev.current_layer + 1
-      }));
+      await distillationAPI.continue(id);
+      // 重新开始轮询
       setPolling(true);
     } catch (err) {
       setError('继续任务失败');
@@ -98,15 +68,11 @@ export default function ProgressPage() {
     }
 
     try {
-      // TODO: Task 16 会调用 API
-      // await fetch(`/api/distillations/${id}/stop`, { method: 'POST' });
-      console.log('停止任务');
-      
-      setTaskData(prev => ({
-        ...prev,
-        status: 'stopped'
-      }));
+      await distillationAPI.stop(id);
       setPolling(false);
+      // 刷新任务状态
+      const data = await distillationAPI.get(id);
+      setTaskData(data);
     } catch (err) {
       setError('停止任务失败');
     }

@@ -1,5 +1,6 @@
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { distillationAPI } from '../api/distillation';
 
 export default function ResultPage() {
   const { id } = useParams();
@@ -16,74 +17,8 @@ export default function ResultPage() {
   useEffect(() => {
     const fetchTaskData = async () => {
       try {
-        // TODO: Task 16 会替换为真实 API 调用
-        // const response = await fetch(`/api/distillations/${id}`);
-        // const data = await response.json();
-        
-        // 模拟数据
-        const mockData = {
-          id: parseInt(id),
-          title: 'AI 产品设计方法论长文',
-          status: 'completed',
-          layer1_result: {
-            paragraph_index: [
-              { type: 'concept', title: '什么是 AI 产品', full_text: null },
-              { type: 'description', title: '核心特征', full_text: 'AI 产品的核心特征包括...' },
-              { type: 'example', title: '案例分析', full_text: '以 ChatGPT 为例...' },
-            ],
-            paragraph_count: 45,
-            completed_at: '2026-05-12T14:25:00'
-          },
-          layer2_result: {
-            distilled_content: `# AI 产品设计核心要点
-
-## 1. 产品定位
-- 明确 AI 能力边界
-- 识别用户真实需求
-- 设计合理的交互模式
-
-## 2. 用户体验
-- 降低学习成本
-- 提供即时反馈
-- 处理边界情况
-
-## 3. 技术实现
-- 选择合适的模型
-- 优化响应速度
-- 保证输出质量`,
-            completed_at: '2026-05-12T14:40:00'
-          },
-          layer3_result: {
-            final_output: `AI 产品设计的三个关键维度：
-
-**产品定位**：首先要明确 AI 的能力边界，不要过度承诺。识别用户的真实需求，而不是被技术驱动。设计合理的交互模式，让用户理解 AI 在做什么。
-
-**用户体验**：降低学习成本，让用户快速上手。提供即时反馈，让用户知道系统状态。妥善处理边界情况，当 AI 无法理解时给出明确提示。
-
-**技术实现**：选择合适的模型，平衡效果和成本。优化响应速度，避免用户等待焦虑。保证输出质量，建立评估和监控机制。`,
-            completed_at: '2026-05-12T14:55:00'
-          },
-          quality_report: {
-            overall_score: 88,
-            confidence_score: 92,
-            bad_cases: [
-              {
-                type: '过度简化',
-                description: '第二层蒸馏中，技术实现部分可能丢失了一些重要细节',
-                severity: 'medium'
-              }
-            ],
-            coverage_analysis: {
-              total_paragraphs: 45,
-              covered_paragraphs: 42,
-              coverage_rate: 93.3
-            }
-          },
-          created_at: '2026-05-12T14:20:00',
-          updated_at: '2026-05-12T14:55:00'
-        };
-        
-        setTaskData(mockData);
+        const data = await distillationAPI.get(id);
+        setTaskData(data);
         setLoading(false);
       } catch (err) {
         setError('获取任务数据失败');
@@ -97,39 +32,17 @@ export default function ResultPage() {
   const handleExport = async (format) => {
     setExporting(true);
     try {
-      // TODO: Task 16 会调用导出 API
-      // const response = await fetch(`/api/distillations/${id}/export?format=${format}`);
-      // const blob = await response.blob();
-      // const url = window.URL.createObjectURL(blob);
-      // const a = document.createElement('a');
-      // a.href = url;
-      // a.download = `${taskData.title}_layer${layer}.${format}`;
-      // a.click();
+      const blob = await distillationAPI.export(id, format);
       
-      console.log(`导出格式: ${format}`);
-      
-      // 模拟导出
-      let content = '';
-      if (format === 'json') {
-        content = JSON.stringify(taskData[`layer${layer}_result`], null, 2);
-      } else if (format === 'markdown') {
-        content = taskData[`layer${layer}_result`]?.distilled_content || 
-                  taskData[`layer${layer}_result`]?.final_output || 
-                  JSON.stringify(taskData[`layer${layer}_result`], null, 2);
-      } else if (format === 'txt') {
-        content = taskData[`layer${layer}_result`]?.final_output || 
-                  taskData[`layer${layer}_result`]?.distilled_content || 
-                  JSON.stringify(taskData[`layer${layer}_result`], null, 2);
-      }
-      
-      const blob = new Blob([content], { type: 'text/plain' });
+      // 创建下载链接
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${taskData.title}_layer${layer}.${format}`;
+      a.download = `${taskData.title}_${format}.${format === 'json' ? 'json' : format === 'yaml' ? 'yaml' : 'md'}`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-      
     } catch (err) {
       setError('导出失败');
     } finally {
