@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { distillationAPI } from '../api/distillation';
+import toast from 'react-hot-toast';
+import api from '../utils/api';
 
 export default function ProgressPage() {
   const { id } = useParams();
@@ -8,14 +9,13 @@ export default function ProgressPage() {
   
   const [taskData, setTaskData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [polling, setPolling] = useState(true);
 
   // 实时轮询
   useEffect(() => {
     const fetchTaskStatus = async () => {
       try {
-        const data = await distillationAPI.get(id);
+        const data = await api.getTask(id);
         setTaskData(data);
         setLoading(false);
         
@@ -24,8 +24,9 @@ export default function ProgressPage() {
           setPolling(false);
         }
       } catch (err) {
-        setError('获取任务状态失败');
+        console.error('Failed to fetch task status:', err);
         setLoading(false);
+        setPolling(false);
       }
     };
 
@@ -44,38 +45,33 @@ export default function ProgressPage() {
 
   const getLayerStatus = (layer) => {
     if (!taskData) return 'pending';
-    if (taskData.current_layer > layer) return 'completed';
-    if (taskData.current_layer === layer) {
-      if (taskData.status.includes('processing')) return 'processing';
-      if (taskData.status.includes('completed')) return 'completed';
+    
+    const currentLayer = taskData.current_layer;
+    
+    // 映射 current_layer 字符串到层级数字
+    const layerMap = {
+      'compressing': 0,
+      'layer1_running': 1,
+      'layer1_done': 1,
+      'layer2_running': 2,
+      'layer2_done': 2,
+      'layer3_running': 3,
+      'layer3_done': 3,
+      'layer4_running': 4,
+      'layer4_done': 4,
+      'generating_report': 5,
+      'completed': 5
+    };
+    
+    const currentLayerNum = layerMap[currentLayer] || 0;
+    
+    // 判断状态
+    if (currentLayerNum > layer) return 'completed';
+    if (currentLayerNum === layer) {
+      if (currentLayer.includes('running')) return 'processing';
+      if (currentLayer.includes('done') || taskData.status === 'completed') return 'completed';
     }
     return 'pending';
-  };
-
-  const handleContinue = async () => {
-    try {
-      await distillationAPI.continue(id);
-      // 重新开始轮询
-      setPolling(true);
-    } catch (err) {
-      setError('继续任务失败');
-    }
-  };
-
-  const handleStop = async () => {
-    if (!confirm('确定要停止这个任务吗？停止后可以稍后继续。')) {
-      return;
-    }
-
-    try {
-      await distillationAPI.stop(id);
-      setPolling(false);
-      // 刷新任务状态
-      const data = await distillationAPI.get(id);
-      setTaskData(data);
-    } catch (err) {
-      setError('停止任务失败');
-    }
   };
 
   const formatDate = (dateString) => {
@@ -102,12 +98,12 @@ export default function ProgressPage() {
     );
   }
 
-  if (error && !taskData) {
+  if (!taskData) {
     return (
       <div className="min-h-screen bg-kenya-brown flex items-center justify-center">
         <div className="kenya-card text-center py-20">
           <div className="text-4xl mb-4">❌</div>
-          <p className="text-kenya-dark/60 mb-6">{error}</p>
+          <p className="text-kenya-dark/60 mb-6">任务不存在</p>
           <button
             onClick={() => navigate('/')}
             className="kenya-button"
@@ -142,15 +138,6 @@ export default function ProgressPage() {
         </div>
       </div>
 
-      {/* 错误提示 */}
-      {error && (
-        <div className="max-w-6xl mx-auto px-6 pt-6">
-          <div className="kenya-card bg-red-50 border-l-4 border-red-500">
-            <p className="text-red-700">{error}</p>
-          </div>
-        </div>
-      )}
-
       {/* 进度区域 */}
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="space-y-6">
@@ -174,6 +161,25 @@ export default function ProgressPage() {
               </p>
             )}
           </div>
+
+          {/* 错误提示 */}
+          {(taskData.status === 'failed' || taskData.status === 'stopped') && taskData.error_message && (
+            <div className="kenya-card bg-red-50 border-l-4 border-red-500">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">❌</div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-red-800 mb-2">任务失败</h3>
+                  <p className="text-sm text-red-700 mb-4">{taskData.error_message}</p>
+                  <button
+                    onClick={() => navigate('/')}
+                    className="px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700 transition-colors"
+                  >
+                    返回首页重试
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* 压缩阶段 */}
           <div className="kenya-card">
@@ -289,8 +295,8 @@ export default function ProgressPage() {
                   3
                 </div>
                 <div>
-                  <h3 className="font-medium text-lg">第三层：最终蒸馏</h3>
-                  <p className="text-sm text-kenya-dark/60">生成认知友好的最终输出</p>
+                  <h3 className="font-medium text-lg">第三层：表达策略分析</h3>
+                  <p className="text-sm text-kenya-dark/60">提取表达模式和标志性短语</p>
                 </div>
               </div>
               <div className="text-sm text-kenya-dark/60">
@@ -317,6 +323,45 @@ export default function ProgressPage() {
             )}
           </div>
 
+          {/* Layer 4 */}
+          <div className="kenya-card">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl
+                  ${getLayerStatus(4) === 'completed' ? 'bg-kenya-dark text-white' : 
+                    getLayerStatus(4) === 'processing' ? 'bg-kenya-line text-white animate-pulse' : 
+                    'bg-kenya-line/30 text-kenya-dark/50'}`}>
+                  4
+                </div>
+                <div>
+                  <h3 className="font-medium text-lg">第四层：认知操作系统</h3>
+                  <p className="text-sm text-kenya-dark/60">整合为可执行的认知规则集</p>
+                </div>
+              </div>
+              <div className="text-sm text-kenya-dark/60">
+                {getLayerStatus(4) === 'completed' && '✓ 已完成'}
+                {getLayerStatus(4) === 'processing' && '处理中...'}
+                {getLayerStatus(4) === 'pending' && '等待中'}
+              </div>
+            </div>
+            
+            {taskData.cognitive_profile && (
+              <div className="mt-4 pt-4 border-t border-kenya-line/30">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-kenya-dark/60">
+                    认知系统已生成
+                  </div>
+                  <button 
+                    onClick={() => navigate(`/result/${id}?layer=4`)}
+                    className="text-sm text-kenya-dark hover:underline"
+                  >
+                    查看结果 →
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* 操作按钮 */}
           <div className="flex gap-4">
             <button
@@ -326,30 +371,12 @@ export default function ProgressPage() {
               返回首页
             </button>
             
-            {taskData.current_layer < 3 && taskData[`layer${taskData.current_layer}_result`] && (
-              <button
-                onClick={handleContinue}
-                className="kenya-button flex-1"
-              >
-                继续下一层
-              </button>
-            )}
-            
             {taskData.status === 'completed' && (
               <button
                 onClick={() => navigate(`/result/${id}`)}
                 className="kenya-button flex-1"
               >
                 查看完整结果
-              </button>
-            )}
-            
-            {taskData.status.includes('processing') && (
-              <button
-                onClick={handleStop}
-                className="px-6 py-3 bg-red-600 text-white hover:bg-red-700 transition-colors"
-              >
-                停止任务
               </button>
             )}
           </div>

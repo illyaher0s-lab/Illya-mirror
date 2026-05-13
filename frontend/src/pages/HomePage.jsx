@@ -247,7 +247,8 @@ export default function HomePage() {
 
                     {/* 操作按钮 */}
                     <div className="flex gap-3">
-                      {task.status.includes('processing') && (
+                      {/* 根据任务状态显示主操作按钮 */}
+                      {(task.status === 'pending' || task.current_layer?.includes('running') || task.current_layer === 'compressing') && (
                         <Link to={`/progress/${task.id}`}>
                           <button className="px-4 py-2 text-sm bg-kenya-dark text-white hover:opacity-90 transition-opacity">
                             查看进度
@@ -255,25 +256,18 @@ export default function HomePage() {
                         </Link>
                       )}
                       
-                      {task.status.includes('completed') && !task.status.includes('processing') && (
-                        <>
-                          <Link to={`/progress/${task.id}`}>
-                            <button className="px-4 py-2 text-sm border border-kenya-line hover:bg-kenya-dark/5 transition-colors">
-                              继续蒸馏
-                            </button>
-                          </Link>
-                          <Link to={`/result/${task.id}`}>
-                            <button className="px-4 py-2 text-sm bg-kenya-dark text-white hover:opacity-90 transition-opacity">
-                              查看结果
-                            </button>
-                          </Link>
-                        </>
-                      )}
-
                       {task.status === 'completed' && (
                         <Link to={`/result/${task.id}`}>
                           <button className="px-4 py-2 text-sm bg-kenya-dark text-white hover:opacity-90 transition-opacity">
                             查看结果
+                          </button>
+                        </Link>
+                      )}
+
+                      {(task.status === 'failed' || task.status === 'stopped') && (
+                        <Link to={`/progress/${task.id}`}>
+                          <button className="px-4 py-2 text-sm bg-kenya-dark text-white hover:opacity-90 transition-opacity">
+                            查看错误
                           </button>
                         </Link>
                       )}
