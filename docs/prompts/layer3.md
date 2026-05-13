@@ -63,6 +63,8 @@
 
 ## 输出格式
 
+**重要：你必须返回严格的 JSON 格式，不要添加任何 markdown 代码块标记（如 ```json），不要添加任何解释性文字。直接输出纯 JSON 对象。**
+
 ```json
 {
   "expression_strategies": [
@@ -95,7 +97,7 @@
     {
       "phrase": "高频词语或句式",
       "cognitive_role": "认知功能（非主题标签）",
-      "frequency": 数字,
+      "frequency": 0,
       "example_source": "文章X·第Y段"
     }
   ],

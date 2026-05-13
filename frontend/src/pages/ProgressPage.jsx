@@ -11,11 +11,23 @@ export default function ProgressPage() {
   const [taskData, setTaskData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [polling, setPolling] = useState(true);
+  const [pollingStartTime] = useState(Date.now());
+  const [isTimeout, setIsTimeout] = useState(false);
+
+  const POLLING_TIMEOUT = 10 * 60 * 1000; // 10 分钟
 
   // 实时轮询
   useEffect(() => {
     const fetchTaskStatus = async () => {
       try {
+        // 检查是否超时
+        if (Date.now() - pollingStartTime > POLLING_TIMEOUT) {
+          setIsTimeout(true);
+          setPolling(false);
+          toast.error('任务处理超时，请刷新页面或联系管理员');
+          return;
+        }
+
         const data = await api.getTask(id);
         setTaskData(data);
         setLoading(false);
@@ -42,7 +54,7 @@ export default function ProgressPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [id, polling]);
+  }, [id, polling, pollingStartTime, POLLING_TIMEOUT]);
 
   const getLayerStatus = (layer) => {
     if (!taskData) return 'pending';
@@ -187,6 +199,35 @@ export default function ProgressPage() {
                   >
                     返回首页重试
                   </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 超时提示 */}
+          {isTimeout && taskData.status !== 'completed' && taskData.status !== 'failed' && (
+            <div className="kenya-card bg-yellow-50 border-l-4 border-yellow-500">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">⏰</div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-yellow-800 mb-2">任务处理超时</h3>
+                  <p className="text-sm text-yellow-700 mb-4">
+                    任务已运行超过 10 分钟，可能遇到问题。建议刷新页面查看最新状态，或联系管理员。
+                  </p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => window.location.reload()}
+                      className="kenya-button text-sm"
+                    >
+                      刷新页面
+                    </button>
+                    <button
+                      onClick={() => navigate('/')}
+                      className="kenya-button-secondary text-sm"
+                    >
+                      返回首页
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -25,6 +25,7 @@ class Distillation(Base):
     layer1_result = Column(JSONB, nullable=True)
     layer2_result = Column(JSONB, nullable=True)
     layer3_result = Column(JSONB, nullable=True)
+    layer4_result = Column(JSONB, nullable=True)
     current_layer = Column(String(20), nullable=True)
     
     created_at = Column(TIMESTAMP, server_default=func.now())

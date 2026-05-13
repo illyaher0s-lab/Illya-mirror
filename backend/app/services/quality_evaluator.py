@@ -151,6 +151,11 @@ class QualityEvaluator:
                 messages=[{"role": "user", "content": prompt}]
             )
             
+            # 检查响应是否有效
+            if not response or not response.content or len(response.content) == 0:
+                print(f"Bad case检测失败: API 返回空响应")
+                return []
+            
             content = response.content[0].text.strip()
             
             # 解析JSON（支持```json代码块）
@@ -210,6 +215,7 @@ class QualityEvaluator:
         all_items.extend(layer2.get("reasoning_patterns", []))
         all_items.extend(layer3.get("expression_strategies", []))
         
+        confidence_ratio = 0  # 初始化为 0
         if all_items:
             high_confidence_count = sum(
                 1 for item in all_items

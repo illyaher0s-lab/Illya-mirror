@@ -107,9 +107,18 @@ def extract_layer1(compressed_text: str) -> dict:
     except json.JSONDecodeError as e:
         # Save raw response for debugging
         error_msg = f"JSON parse error at line {e.lineno} col {e.colno}: {e.msg}"
+        
+        # Save to file for debugging
+        import time
+        debug_file = f"/tmp/layer1_error_{int(time.time())}.txt"
+        with open(debug_file, 'w', encoding='utf-8') as f:
+            f.write(f"Error: {error_msg}\n\n")
+            f.write(f"Full response:\n{json_text}\n")
+        
         print(f"[Layer 1] {error_msg}")
-        print(f"[Layer 1] Raw response (first 500 chars): {json_text[:500]}")
-        raise ValueError(f"{error_msg}. Check logs for full response.")
+        print(f"[Layer 1] Full response saved to: {debug_file}")
+        print(f"[Layer 1] Response preview (first 1000 chars):\n{json_text[:1000]}")
+        raise ValueError(f"{error_msg}. Full response saved to {debug_file}")
 
 
 def extract_layer2(layer1_result: dict) -> dict:
@@ -209,4 +218,59 @@ def extract_layer3(layer1_result: dict, layer2_result: dict) -> dict:
         error_msg = f"JSON parse error at line {e.lineno} col {e.colno}: {e.msg}"
         print(f"[Layer 3] {error_msg}")
         print(f"[Layer 3] Raw response (first 500 chars): {json_text[:500]}")
+        raise ValueError(f"{error_msg}. Check logs for full response.")
+
+
+def extract_layer4(layer1_result: dict, layer2_result: dict, layer3_result: dict) -> dict:
+    """
+    Integrate three-layer analysis into a cognitive operating system.
+    
+    Args:
+        layer1_result: Output from extract_layer1
+        layer2_result: Output from extract_layer2
+        layer3_result: Output from extract_layer3
+        
+    Returns:
+        dict: Cognitive operating system JSON (identity, core_assumptions, reasoning_engine, expression_engine, usage_instructions)
+    """
+    client = get_client()
+    prompt = load_prompt("4")
+    
+    combined_input = {
+        "layer1": layer1_result,
+        "layer2": layer2_result,
+        "layer3": layer3_result
+    }
+    
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=16000,
+        temperature=0,
+        messages=[
+            {
+                "role": "user",
+                "content": f"{prompt}\n\n---\n\n## 输入数据（请求1、2、3的输出）\n\n```json\n{json.dumps(combined_input, ensure_ascii=False, indent=2)}\n```"
+            }
+        ]
+    )
+    
+    response_text = message.content[0].text
+    
+    if "```json" in response_text:
+        json_start = response_text.find("```json") + 7
+        json_end = response_text.find("```", json_start)
+        json_text = response_text[json_start:json_end].strip()
+    elif "```" in response_text:
+        json_start = response_text.find("```") + 3
+        json_end = response_text.find("```", json_start)
+        json_text = response_text[json_start:json_end].strip()
+    else:
+        json_text = response_text.strip()
+    
+    try:
+        return json.loads(json_text)
+    except json.JSONDecodeError as e:
+        error_msg = f"JSON parse error at line {e.lineno} col {e.colno}: {e.msg}"
+        print(f"[Layer 4] {error_msg}")
+        print(f"[Layer 4] Raw response (first 500 chars): {json_text[:500]}")
         raise ValueError(f"{error_msg}. Check logs for full response.")

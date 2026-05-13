@@ -109,15 +109,15 @@ class ReportGenerator:
         
         all_items = []
         all_items.extend([
-            {"type": "底层假设", "id": item.get("id"), "content": item.get("assumption"), "confidence": evaluator.calculate_confidence(item)}
+            {"type": "底层假设", "id": item.get("id"), "content": item.get("assumption") or "", "confidence": evaluator.calculate_confidence(item)}
             for item in layer1.get("fundamental_assumptions", [])
         ])
         all_items.extend([
-            {"type": "推理规则", "id": item.get("id"), "content": item.get("pattern"), "confidence": evaluator.calculate_confidence(item)}
+            {"type": "推理规则", "id": item.get("id"), "content": item.get("pattern") or "", "confidence": evaluator.calculate_confidence(item)}
             for item in layer2.get("reasoning_patterns", [])
         ])
         all_items.extend([
-            {"type": "表达策略", "id": item.get("id"), "content": item.get("strategy"), "confidence": evaluator.calculate_confidence(item)}
+            {"type": "表达策略", "id": item.get("id"), "content": item.get("strategy") or "", "confidence": evaluator.calculate_confidence(item)}
             for item in layer3.get("expression_strategies", [])
         ])
         
@@ -157,9 +157,9 @@ class ReportGenerator:
             }
             section += f"""### 矛盾 {i}：{type_map.get(case['type'], '未知类型')}
 
-**条目1：** [{case['item1_id']}] {case['item1_content'][:100]}...  
-**条目2：** [{case['item2_id']}] {case['item2_content'][:100]}...  
-**矛盾原因：** {case['contradiction_reason']}
+**条目1：** [{case.get('item1_id', 'N/A')}] {(case.get('item1_content') or '')[:100]}...  
+**条目2：** [{case.get('item2_id', 'N/A')}] {(case.get('item2_content') or '')[:100]}...  
+**矛盾原因：** {case.get('contradiction_reason', '未知')}
 
 """
         return section

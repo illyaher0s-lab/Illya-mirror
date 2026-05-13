@@ -2,7 +2,7 @@
 
 **在线访问**: http://43.128.11.119
 
-将长文本通过三层 AI 蒸馏，转化为认知友好的结构化内容。
+将长文本通过四层 AI 蒸馏，转化为认知友好的结构化内容。
 
 ## 项目简介
 
@@ -10,10 +10,11 @@ Mirror 是一个基于多阶段 LLM 蒸馏的知识提取系统，采用 **Gemin
 
 ### 核心特性
 
-- **三层串行蒸馏**：段落索引 → 深度蒸馏 → 最终输出
+- **四层串行蒸馏**：段落索引 → 推理模式 → 表达策略 → 认知画像
 - **分段交付**：每层完成后可查看结果、继续或停止
 - **质量评估**：置信度评分、Bad Case 检测、覆盖度分析
-- **实时监控**：WebSocket 实时进度更新
+- **导出功能**：支持 JSON/YAML/Markdown 格式导出认知画像
+- **实时监控**：实时进度更新
 - **Kenya Hara 设计**：东方极简美学的用户界面
 
 ## 技术栈
@@ -129,9 +130,10 @@ GET    /api/distillations/{id}         # 获取任务详情
 DELETE /api/distillations/{id}         # 删除任务
 POST   /api/distillations/{id}/continue # 继续下一层蒸馏
 POST   /api/distillations/{id}/stop    # 停止任务
-GET    /api/distillations/{id}/layer1  # 第一层结果（段落索引）
-GET    /api/distillations/{id}/layer2  # 第二层结果（深度蒸馏）
-GET    /api/distillations/{id}/layer3  # 第三层结果（最终输出）
+GET    /api/distillations/{id}/layer1  # 第一层结果（底层假设）
+GET    /api/distillations/{id}/layer2  # 第二层结果（推理模式）
+GET    /api/distillations/{id}/layer3  # 第三层结果（表达策略）
+GET    /api/distillations/{id}/layer4  # 第四层结果（认知画像）
 GET    /api/distillations/{id}/quality # 质量报告
 GET    /api/distillations/{id}/export  # 导出结果（json/yaml/markdown）
 ```
@@ -141,22 +143,27 @@ GET    /api/distillations/{id}/export  # 导出结果（json/yaml/markdown）
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
-## 三层蒸馏架构
+## 四层蒸馏架构
 
-### 第一层：段落索引
+### 第一层：底层假设（Foundational Assumptions）
 - **输入**：原始长文本
-- **处理**：Gemini 2.0 Flash 压缩 + Claude Sonnet 4 段落分类
+- **处理**：Gemini 2.0 Flash 压缩 + Claude Sonnet 4 提取核心假设
 - **输出**：`paragraph_index`（段落类型 + 关键内容）
 
-### 第二层：深度蒸馏
+### 第二层：推理模式（Reasoning Patterns）
 - **输入**：`paragraph_index`（不传压缩文本，避免层间漂移）
-- **处理**：Claude Sonnet 4 提取核心概念和知识结构
-- **输出**：结构化的核心内容
+- **处理**：Claude Sonnet 4 提取推理模式和思维方式
+- **输出**：结构化的推理引擎
 
-### 第三层：最终蒸馏
+### 第三层：表达策略（Expression Strategies）
 - **输入**：`paragraph_index`
-- **处理**：Claude Sonnet 4 生成认知友好的最终输出
-- **输出**：易于理解和吸收的文本
+- **处理**：Claude Sonnet 4 分析表达方式和沟通策略
+- **输出**：表达引擎
+
+### 第四层：认知画像（Cognitive Profile）
+- **输入**：前三层结果
+- **处理**：Claude Sonnet 4 综合生成完整认知画像
+- **输出**：可导出的认知画像（JSON/YAML/Markdown）
 
 ## 质量评估
 
@@ -194,24 +201,27 @@ sudo journalctl -u mirror-backend -f
 
 ## 开发状态
 
-### ✅ 已完成（Task 1-18）
+### ✅ 已完成
 
 - [x] 项目初始化和数据库设计
-- [x] 三层蒸馏引擎实现
+- [x] 四层蒸馏引擎实现
 - [x] 质量评估模块
 - [x] 前端完整实现（4个页面）
 - [x] API 集成
+- [x] 导出功能（JSON/YAML/Markdown）
 - [x] 生产环境部署
 - [x] Nginx 配置
 - [x] systemd 服务配置
+- [x] Layer 4 数据库迁移和架构升级（2026-05-13）
 
-### ⏳ 待优化（Task 19-23）
+### ⏳ 待优化
 
-- [ ] 域名配置（可选）
+- [ ] Gemini API 集成（当前压缩服务缺失）
 - [ ] 真实案例测试
 - [ ] Prompt 优化
 - [ ] 性能测试和优化
-- [ ] 文档完善
+- [ ] 用户认证和权限管理
+- [ ] 考虑废弃 cognitive_profiles 表（当前保留以向后兼容）
 
 ## 环境变量
 

@@ -6,7 +6,7 @@ import time
 from sqlalchemy.orm import Session
 from app.models import Distillation
 from app.database import SessionLocal
-from app.services.claude_distiller import compress_text, extract_layer1, extract_layer2, extract_layer3
+from app.services.claude_distiller import compress_text, extract_layer1, extract_layer2, extract_layer3, extract_layer4
 
 
 def run_distillation(distillation_id: str):
@@ -94,18 +94,6 @@ def _distillation_worker(distillation_id: str):
             db.commit()
             return
         
-        # Wait for user confirmation to continue
-        while True:
-            time.sleep(2)
-            db.refresh(distillation)
-            
-            if distillation.current_layer == "stopped":
-                distillation.status = "stopped"
-                db.commit()
-                return
-            elif distillation.current_layer == "layer1_continue":
-                break
-        
         # ===== Layer 2: Reasoning Patterns =====
         distillation.current_layer = "layer2_running"
         db.commit()
@@ -123,18 +111,6 @@ def _distillation_worker(distillation_id: str):
             db.commit()
             return
         
-        # Wait for user confirmation to continue
-        while True:
-            time.sleep(2)
-            db.refresh(distillation)
-            
-            if distillation.current_layer == "stopped":
-                distillation.status = "stopped"
-                db.commit()
-                return
-            elif distillation.current_layer == "layer2_continue":
-                break
-        
         # ===== Layer 3: Expression Strategies =====
         distillation.current_layer = "layer3_running"
         db.commit()
@@ -149,6 +125,24 @@ def _distillation_worker(distillation_id: str):
             distillation.status = "failed"
             distillation.error_message = f"Layer 3 failed: {str(e)}"
             distillation.current_layer = "layer3_failed"
+            db.commit()
+            return
+        
+        # ===== Layer 4: Cognitive Operating System =====
+        distillation.current_layer = "layer4_running"
+        db.commit()
+        
+        try:
+            layer4_result = extract_layer4(layer1_result, layer2_result, layer3_result)
+            
+            # Save to distillations.layer4_result
+            distillation.layer4_result = layer4_result
+            distillation.current_layer = "layer4_done"
+            db.commit()
+        except Exception as e:
+            distillation.status = "failed"
+            distillation.error_message = f"Layer 4 failed: {str(e)}"
+            distillation.current_layer = "layer4_failed"
             db.commit()
             return
         
@@ -217,17 +211,20 @@ def _generate_quality_report(db: Session, distillation: Distillation):
     )
     
     # Save to database
-    quality_report = QualityReport(
-        distillation_id=distillation.id,
-        overall_score=overall_score["score"],
-        rating=overall_score["rating"],
-        coverage_analysis=coverage,
-        confidence_analysis={
+    report_data = {
+        "overall_score": overall_score["score"],
+        "rating": overall_score["rating"],
+        "coverage_analysis": coverage,
+        "confidence_analysis": {
             "breakdown": overall_score["breakdown"]
         },
-        bad_cases=bad_cases,
-        iteration_suggestions=suggestions,
-        markdown_report=markdown_report
+        "bad_cases": bad_cases,
+        "iteration_suggestions": suggestions
+    }
+    quality_report = QualityReport(
+        distillation_id=distillation.id,
+        report_json=report_data,
+        report_markdown=markdown_report
     )
     db.add(quality_report)
     db.commit()

@@ -23,6 +23,11 @@ class DistillationResponse(BaseModel):
     current_layer: Optional[str] = None
     quality_score: Optional[str] = None
     error_message: Optional[str] = None
+    layer1_result: Optional[dict] = None
+    layer2_result: Optional[dict] = None
+    layer3_result: Optional[dict] = None
+    cognitive_profile: Optional[dict] = None
+    quality_report: Optional[dict] = None
     created_at: datetime
     updated_at: datetime
 

@@ -11,6 +11,7 @@ export default function UploadPage() {
     content: ''
   });
   const [loading, setLoading] = useState(false);
+  const [fileLoading, setFileLoading] = useState(false);
 
   const wordCount = formData.content.length;
   const isValidLength = wordCount >= 1000 && wordCount <= 50000;
@@ -19,6 +20,7 @@ export default function UploadPage() {
     const file = e.target.files[0];
     if (!file) return;
 
+    setFileLoading(true);
     const reader = new FileReader();
     reader.onload = (event) => {
       const text = event.target.result;
@@ -29,6 +31,12 @@ export default function UploadPage() {
         const fileName = file.name.replace(/\.[^/.]+$/, ''); // 去掉扩展名
         setFormData(prev => ({...prev, title: fileName}));
       }
+      setFileLoading(false);
+      toast.success('文件读取成功');
+    };
+    reader.onerror = () => {
+      setFileLoading(false);
+      toast.error('文件读取失败，请重试');
     };
     reader.readAsText(file);
   };
@@ -125,13 +133,14 @@ export default function UploadPage() {
           <div className="kenya-card">
             <div className="flex justify-between items-center mb-2">
               <label className="font-medium">文本内容</label>
-              <label className="px-4 py-2 text-sm border border-kenya-line hover:bg-kenya-dark/5 transition-colors cursor-pointer">
-                上传文件
+              <label className={`px-4 py-2 text-sm border border-kenya-line hover:bg-kenya-dark/5 transition-colors ${fileLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                {fileLoading ? '读取文件中...' : '上传文件'}
                 <input
                   type="file"
                   accept=".txt,.md"
                   onChange={handleFileUpload}
                   className="hidden"
+                  disabled={fileLoading}
                 />
               </label>
             </div>

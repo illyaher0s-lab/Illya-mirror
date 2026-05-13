@@ -53,6 +53,8 @@
 
 ## 输出格式
 
+**重要：你必须返回严格的 JSON 格式，不要添加任何 markdown 代码块标记（如 ```json），不要添加任何解释性文字。直接输出纯 JSON 对象。**
+
 ```json
 {
   "reasoning_patterns": [
@@ -89,7 +91,7 @@
     "orphaned": ["FA-02未被任何推理规则使用，可能是独立信念而非推理前提"]
   },
   "extraction_notes": {
-    "total_reasoning_segments_analyzed": 数字,
+    "total_reasoning_segments_analyzed": 0,
     "patterns_discarded": "被淘汰的候选模式及原因",
     "index_insufficient": "标注为索引内容不足而跳过的段落"
   }
