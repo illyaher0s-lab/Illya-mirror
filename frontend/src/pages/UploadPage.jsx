@@ -132,7 +132,20 @@ export default function UploadPage() {
           {/* 文本内容 */}
           <div className="kenya-card">
             <div className="flex justify-between items-center mb-2">
-              <label className="font-medium">文本内容</label>
+              <div className="flex items-center gap-4">
+                <label className="font-medium">文本内容</label>
+                <p className={`text-sm font-medium ${getWordCountColor()}`}>
+                  {wordCount.toLocaleString()} 字
+                  {wordCount > 0 && !isValidLength && (
+                    <span className="ml-2">
+                      {wordCount < 1000 ? '(太短)' : '(太长)'}
+                    </span>
+                  )}
+                  {wordCount > 0 && isValidLength && (
+                    <span className="ml-2">✓</span>
+                  )}
+                </p>
+              </div>
               <label className={`px-4 py-2 text-sm border border-kenya-line hover:bg-kenya-dark/5 transition-colors ${fileLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                 {fileLoading ? '读取文件中...' : '上传文件'}
                 <input
@@ -153,20 +166,9 @@ export default function UploadPage() {
               required
             />
             
-            <div className="flex justify-between items-center mt-2">
+            <div className="mt-2">
               <p className="text-sm text-kenya-dark/50">
                 建议长度：1000-10000 字
-              </p>
-              <p className={`text-sm font-medium ${getWordCountColor()}`}>
-                {wordCount.toLocaleString()} 字
-                {wordCount > 0 && !isValidLength && (
-                  <span className="ml-2">
-                    {wordCount < 1000 ? '(太短)' : '(太长)'}
-                  </span>
-                )}
-                {wordCount > 0 && isValidLength && (
-                  <span className="ml-2">✓</span>
-                )}
               </p>
             </div>
           </div>
@@ -190,7 +192,7 @@ export default function UploadPage() {
             </button>
           </div>
 
-          {/* 提示信息 */}
+          {/* 实时验证提示 */}
           {!isValidLength && wordCount > 0 && (
             <div className="kenya-card bg-yellow-50 border-l-4 border-yellow-500">
               <p className="text-sm text-yellow-800">
@@ -198,6 +200,15 @@ export default function UploadPage() {
                   ? `还需要 ${(1000 - wordCount).toLocaleString()} 字才能开始蒸馏`
                   : `文本过长，请删减 ${(wordCount - 50000).toLocaleString()} 字`
                 }
+              </p>
+            </div>
+          )}
+          
+          {/* 标题为空提示 */}
+          {!formData.title.trim() && formData.content.trim() && (
+            <div className="kenya-card bg-blue-50 border-l-4 border-blue-500">
+              <p className="text-sm text-blue-800">
+                请输入任务标题
               </p>
             </div>
           )}

@@ -31,6 +31,21 @@ export default function ResultPage() {
     fetchTaskData();
   }, [id]);
 
+  // 键盘导航支持
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // 左右箭头切换 Tab
+      if (e.key === 'ArrowLeft') {
+        setActiveTab('content');
+      } else if (e.key === 'ArrowRight') {
+        setActiveTab('quality');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleExport = async (format) => {
     setExporting(true);
     try {
@@ -611,28 +626,55 @@ export default function ResultPage() {
           </button>
         </div>
 
-        {/* Tab 切换 */}
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={() => setActiveTab('content')}
-            className={`px-6 py-3 transition-colors ${
-              activeTab === 'content' 
-                ? 'bg-kenya-dark text-white' 
-                : 'bg-white/50 hover:bg-white/70'
-            }`}
-          >
-            蒸馏内容
-          </button>
-          <button
-            onClick={() => setActiveTab('quality')}
-            className={`px-6 py-3 transition-colors ${
-              activeTab === 'quality' 
-                ? 'bg-kenya-dark text-white' 
-                : 'bg-white/50 hover:bg-white/70'
-            }`}
-          >
-            质量报告
-          </button>
+        {/* Tab 切换 + 导出按钮 */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex gap-4">
+            <button
+              onClick={() => setActiveTab('content')}
+              className={`px-6 py-3 transition-colors ${
+                activeTab === 'content' 
+                  ? 'bg-kenya-dark text-white' 
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+            >
+              蒸馏内容
+            </button>
+            <button
+              onClick={() => setActiveTab('quality')}
+              className={`px-6 py-3 transition-colors ${
+                activeTab === 'quality' 
+                  ? 'bg-kenya-dark text-white' 
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+            >
+              质量报告
+            </button>
+          </div>
+          
+          {/* 导出按钮组 */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleExport('json')}
+              className="kenya-button text-sm disabled:opacity-50"
+              disabled={exporting}
+            >
+              {exporting ? '导出中...' : '导出 JSON'}
+            </button>
+            <button
+              onClick={() => handleExport('markdown')}
+              className="kenya-button-secondary text-sm disabled:opacity-50"
+              disabled={exporting}
+            >
+              {exporting ? '导出中...' : '导出 Markdown'}
+            </button>
+            <button
+              onClick={() => handleExport('txt')}
+              className="kenya-button-secondary text-sm disabled:opacity-50"
+              disabled={exporting}
+            >
+              {exporting ? '导出中...' : '导出 TXT'}
+            </button>
+          </div>
         </div>
 
         {/* 内容展示 */}
@@ -752,31 +794,10 @@ export default function ResultPage() {
         )}
 
         {/* 操作按钮 */}
-        <div className="flex gap-4">
-          <button
-            onClick={() => handleExport('json')}
-            className="kenya-button disabled:opacity-50"
-            disabled={exporting}
-          >
-            {exporting ? '导出中...' : '导出 JSON'}
-          </button>
-          <button
-            onClick={() => handleExport('markdown')}
-            className="kenya-button-secondary disabled:opacity-50"
-            disabled={exporting}
-          >
-            {exporting ? '导出中...' : '导出 Markdown'}
-          </button>
-          <button
-            onClick={() => handleExport('txt')}
-            className="kenya-button-secondary disabled:opacity-50"
-            disabled={exporting}
-          >
-            {exporting ? '导出中...' : '导出 TXT'}
-          </button>
+        <div className="flex gap-4 justify-end">
           <button
             onClick={() => navigate(`/progress/${id}`)}
-            className="kenya-button-secondary ml-auto"
+            className="kenya-button-secondary"
           >
             返回进度页
           </button>

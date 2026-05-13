@@ -168,7 +168,15 @@ export default function ProgressPage() {
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-medium">整体进度</h3>
               <span className="text-sm text-kenya-dark/60">
-                {taskData.progress_detail?.percentage || 0}%
+                {(() => {
+                  const layer = taskData.current_layer;
+                  if (taskData.status === 'completed') return '第 4/4 步';
+                  if (layer === 'compressing') return '第 1/4 步';
+                  if (layer?.includes('layer1')) return '第 2/4 步';
+                  if (layer?.includes('layer2')) return '第 3/4 步';
+                  if (layer?.includes('layer3')) return '第 4/4 步';
+                  return '第 0/4 步';
+                })()}
               </span>
             </div>
             <div className="h-3 bg-kenya-line/20 overflow-hidden mb-2">

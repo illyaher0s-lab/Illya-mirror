@@ -155,47 +155,52 @@ export default function HomePage() {
 
         {/* 筛选器 */}
         {tasks.length > 0 && (
-          <div className="flex gap-3 mb-6">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 text-sm transition-colors ${
-                filter === 'all' 
-                  ? 'bg-kenya-dark text-white' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            >
-              全部 ({tasks.length})
-            </button>
-            <button
-              onClick={() => setFilter('processing')}
-              className={`px-4 py-2 text-sm transition-colors ${
-                filter === 'processing' 
-                  ? 'bg-kenya-dark text-white' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            >
-              处理中 ({tasks.filter(t => t.current_layer?.includes('running') || t.current_layer === 'compressing').length})
-            </button>
-            <button
-              onClick={() => setFilter('completed')}
-              className={`px-4 py-2 text-sm transition-colors ${
-                filter === 'completed' 
-                  ? 'bg-kenya-dark text-white' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            >
-              已完成 ({tasks.filter(t => t.status === 'completed').length})
-            </button>
-            <button
-              onClick={() => setFilter('failed')}
-              className={`px-4 py-2 text-sm transition-colors ${
-                filter === 'failed' 
-                  ? 'bg-kenya-dark text-white' 
-                  : 'bg-white/50 hover:bg-white/70'
-              }`}
-            >
-              失败 ({tasks.filter(t => t.status === 'failed' || t.status === 'stopped').length})
-            </button>
+          <div className="kenya-card mb-6">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-kenya-dark/60 font-medium">筛选：</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setFilter('all')}
+                  className={`px-4 py-2 text-sm transition-colors border ${ 
+                    filter === 'all' 
+                      ? 'bg-kenya-dark text-white border-kenya-dark' 
+                      : 'bg-white border-kenya-line hover:border-kenya-dark'
+                  }`}
+                >
+                  全部 ({tasks.length})
+                </button>
+                <button
+                  onClick={() => setFilter('processing')}
+                  className={`px-4 py-2 text-sm transition-colors border ${ 
+                    filter === 'processing' 
+                      ? 'bg-kenya-dark text-white border-kenya-dark' 
+                      : 'bg-white border-kenya-line hover:border-kenya-dark'
+                  }`}
+                >
+                  处理中 ({tasks.filter(t => t.current_layer?.includes('running') || t.current_layer === 'compressing').length})
+                </button>
+                <button
+                  onClick={() => setFilter('completed')}
+                  className={`px-4 py-2 text-sm transition-colors border ${ 
+                    filter === 'completed' 
+                      ? 'bg-kenya-dark text-white border-kenya-dark' 
+                      : 'bg-white border-kenya-line hover:border-kenya-dark'
+                  }`}
+                >
+                  已完成 ({tasks.filter(t => t.status === 'completed').length})
+                </button>
+                <button
+                  onClick={() => setFilter('failed')}
+                  className={`px-4 py-2 text-sm transition-colors border ${ 
+                    filter === 'failed' 
+                      ? 'bg-kenya-dark text-white border-kenya-dark' 
+                      : 'bg-white border-kenya-line hover:border-kenya-dark'
+                  }`}
+                >
+                  失败 ({tasks.filter(t => t.status === 'failed' || t.status === 'stopped').length})
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -232,16 +237,14 @@ export default function HomePage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-medium">{task.name}</h3>
+                      <h3 className="text-xl font-medium" title={task.name}>{task.name}</h3>
                       <span className={`px-3 py-1 text-xs rounded-full ${getStatusColor(task.status, task.current_layer)}`}>
                         {getStatusText(task.status, task.current_layer)}
                       </span>
                     </div>
                     
-                    <div className="flex items-center gap-6 text-sm text-kenya-dark/60 mb-4">
-                      <span>任务 ID: {task.id}</span>
-                      <span>创建于 {formatDate(task.created_at)}</span>
-                      <span>更新于 {formatDate(task.updated_at)}</span>
+                    <div className="flex items-center gap-4 text-sm text-kenya-dark/60 mb-4">
+                      <span>最后更新 {formatDate(task.updated_at)}</span>
                     </div>
 
                     {/* 进度条 */}
@@ -296,6 +299,15 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+            
+            {/* 列表底部的创建按钮 */}
+            <div className="text-center pt-4">
+              <Link to="/upload">
+                <button className="kenya-button-secondary">
+                  + 创建新任务
+                </button>
+              </Link>
+            </div>
           </div>
         )}
 
