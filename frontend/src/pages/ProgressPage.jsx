@@ -2,12 +2,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
-import Header from '../components/Header';
+import AppHeader from '../components/AppHeader';
+import PageContainer from '../components/PageContainer';
+import PageTitle from '../components/PageTitle';
+import ResultCard from '../components/ResultCard';
+import LoadingState from '../components/LoadingState';
+import ErrorState from '../components/ErrorState';
+import SecondaryButton from '../components/SecondaryButton';
 
 export default function ProgressPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+
   const [taskData, setTaskData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [polling, setPolling] = useState(true);
@@ -16,7 +22,6 @@ export default function ProgressPage() {
 
   const POLLING_TIMEOUT = 10 * 60 * 1000; // 10 分钟
 
-  // 实时轮询
   useEffect(() => {
     const fetchTaskStatus = async () => {
       try {
@@ -24,17 +29,23 @@ export default function ProgressPage() {
         if (Date.now() - pollingStartTime > POLLING_TIMEOUT) {
           setIsTimeout(true);
           setPolling(false);
-          toast.error('任务处理超时，请刷新页面或联系管理员');
           return;
         }
 
         const data = await api.getTask(id);
         setTaskData(data);
         setLoading(false);
-        
+
         // 如果任务完成或失败，停止轮询
         if (data.status === 'completed' || data.status === 'failed' || data.status === 'stopped') {
           setPolling(false);
+          
+          // 如果完成，自动跳转到结果页
+          if (data.status === 'completed') {
+            setTimeout(() => {
+              navigate(`/result/${id}`);
+            }, 1000);
+          }
         }
       } catch (err) {
         console.error('Failed to fetch task status:', err);
@@ -45,7 +56,6 @@ export default function ProgressPage() {
 
     fetchTaskStatus();
 
-    // 每 3 秒轮询一次
     let interval;
     if (polling) {
       interval = setInterval(fetchTaskStatus, 3000);
@@ -54,394 +64,189 @@ export default function ProgressPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [id, polling, pollingStartTime, POLLING_TIMEOUT]);
+  }, [id, polling, pollingStartTime, navigate]);
 
-  const getLayerStatus = (layer) => {
-    if (!taskData) return 'pending';
+  const getCurrentStep = () => {
+    if (!taskData) return 0;
     
     const currentLayer = taskData.current_layer;
     
-    // 映射 current_layer 字符串到层级数字
-    const layerMap = {
-      'compressing': 0,
-      'layer1_running': 1,
-      'layer1_done': 1,
-      'layer2_running': 2,
-      'layer2_done': 2,
-      'layer3_running': 3,
-      'layer3_done': 3,
-      'layer4_running': 4,
-      'layer4_done': 4,
-      'generating_report': 5,
-      'completed': 5
-    };
+    if (currentLayer === 'compressing') return 1;
+    if (currentLayer === 'layer1_running' || currentLayer === 'layer1_done') return 2;
+    if (currentLayer === 'layer2_running' || currentLayer === 'layer2_done') return 2;
+    if (currentLayer === 'layer3_running' || currentLayer === 'layer3_done') return 3;
+    if (currentLayer === 'layer4_running' || currentLayer === 'layer4_done') return 3;
+    if (currentLayer === 'generating_report' || taskData.status === 'completed') return 4;
     
-    const currentLayerNum = layerMap[currentLayer] || 0;
-    
-    // 判断状态
-    if (currentLayerNum > layer) return 'completed';
-    if (currentLayerNum === layer) {
-      if (currentLayer.includes('running')) return 'processing';
-      if (currentLayer.includes('done') || taskData.status === 'completed') return 'completed';
-    }
-    return 'pending';
+    return 1;
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const steps = [
+    '上传完成',
+    '分析中',
+    '压缩中',
+    '完成'
+  ];
+
+  const currentStep = getCurrentStep();
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-kenya-brown flex items-center justify-center">
-        <div className="kenya-card text-center py-20">
-          <div className="animate-pulse">
-            <div className="text-4xl mb-4">⏳</div>
-            <p className="text-kenya-dark/60">加载任务信息...</p>
-          </div>
-        </div>
+      <div className="min-h-screen bg-kenya-brown">
+        <AppHeader />
+        <PageContainer>
+          <LoadingState message="加载任务信息..." />
+        </PageContainer>
       </div>
     );
   }
 
   if (!taskData) {
     return (
-      <div className="min-h-screen bg-kenya-brown flex items-center justify-center">
-        <div className="kenya-card text-center py-20">
-          <div className="text-4xl mb-4">❌</div>
-          <p className="text-kenya-dark/60 mb-6">任务不存在</p>
-          <button
-            onClick={() => navigate('/')}
-            className="kenya-button"
-          >
-            返回首页
-          </button>
-        </div>
+      <div className="min-h-screen bg-kenya-brown">
+        <AppHeader />
+        <PageContainer>
+          <ErrorState
+            title="任务不存在"
+            message="未找到该任务，可能已被删除"
+            actions={[
+              <SecondaryButton key="home" onClick={() => navigate('/')}>
+                返回首页
+              </SecondaryButton>
+            ]}
+          />
+        </PageContainer>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-kenya-brown">
-      <Header />
-      
-      {/* Hero 区域 */}
+      <AppHeader />
+
+      {/* Hero 区 */}
       <div className="bg-kenya-cream py-12">
-        <div className="max-w-6xl mx-auto px-6">
+        <PageContainer>
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-kenya-dark/60 hover:text-kenya-dark transition-colors mb-4"
+            className="flex items-center gap-2 text-kenya-dark/60 hover:text-kenya-dark transition-colors mb-4 text-sm"
           >
             <span>←</span>
-            <span className="text-sm">返回首页</span>
+            <span>返回首页</span>
           </button>
-          <h1 className="font-serif text-5xl mb-2">{taskData.title}</h1>
-          <div className="flex items-center gap-4 text-kenya-dark/70">
-            <span>任务 ID: {id}</span>
-            <span>•</span>
-            <span>创建于 {formatDate(taskData.created_at)}</span>
-            {polling && (
-              <>
-                <span>•</span>
-                <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  实时更新中
-                </span>
-              </>
-            )}
-          </div>
-        </div>
+          <PageTitle
+            title={taskData.name}
+            subtitle="蒸馏进行中"
+          />
+        </PageContainer>
       </div>
 
-      {/* 进度区域 */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        <div className="space-y-6">
-          {/* 整体进度条 */}
-          <div className="kenya-card">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="font-medium">整体进度</h3>
-              <span className="text-sm text-kenya-dark/60">
-                {(() => {
-                  const layer = taskData.current_layer;
-                  if (taskData.status === 'completed') return '第 4/4 步';
-                  if (layer === 'compressing') return '第 1/4 步';
-                  if (layer?.includes('layer1')) return '第 2/4 步';
-                  if (layer?.includes('layer2')) return '第 3/4 步';
-                  if (layer?.includes('layer3')) return '第 4/4 步';
-                  return '第 0/4 步';
-                })()}
-              </span>
-            </div>
-            <div className="h-3 bg-kenya-line/20 overflow-hidden mb-2">
-              <div 
-                className="h-full bg-kenya-dark transition-all duration-500"
-                style={{ width: `${taskData.progress_detail?.percentage || 0}%` }}
-              />
-            </div>
-            {taskData.progress_detail?.current_step && (
-              <p className="text-sm text-kenya-dark/60">
-                {taskData.progress_detail.current_step}
-              </p>
-            )}
-          </div>
-
-          {/* 错误提示 */}
-          {(taskData.status === 'failed' || taskData.status === 'stopped') && taskData.error_message && (
-            <div className="kenya-card bg-red-50 border-l-4 border-red-500">
-              <div className="flex items-start gap-3">
-                <div className="text-2xl">❌</div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-red-800 mb-2">任务失败</h3>
-                  <p className="text-sm text-red-700 mb-4">{taskData.error_message}</p>
-                  <button
-                    onClick={() => navigate('/')}
-                    className="kenya-button text-sm"
-                    style={{ background: '#DC2626' }}
-                  >
-                    返回首页重试
-                  </button>
+      {/* 进度区 */}
+      <PageContainer>
+        <ResultCard>
+          {/* 步骤进度条 */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              {steps.map((step, idx) => (
+                <div key={idx} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center flex-1">
+                    <div
+                      className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-all ${
+                        currentStep > idx
+                          ? 'bg-kenya-dark text-white'
+                          : currentStep === idx
+                          ? 'bg-kenya-dark text-white animate-pulse'
+                          : 'bg-kenya-line/20 text-kenya-dark/40'
+                      }`}
+                    >
+                      {idx + 1}
+                    </div>
+                    <span
+                      className={`mt-2 text-sm font-medium ${
+                        currentStep >= idx ? 'text-kenya-dark' : 'text-kenya-dark/40'
+                      }`}
+                    >
+                      {step}
+                    </span>
+                  </div>
+                  {idx < steps.length - 1 && (
+                    <div className="flex-1 h-1 mx-4 -mt-8">
+                      <div
+                        className={`h-full transition-all ${
+                          currentStep > idx ? 'bg-kenya-dark' : 'bg-kenya-line/20'
+                        }`}
+                      />
+                    </div>
+                  )}
                 </div>
-              </div>
+              ))}
             </div>
-          )}
+            <p className="text-center text-base text-kenya-dark/60">
+              {polling ? `第 ${currentStep} / ${steps.length} 步：${steps[currentStep - 1]}` : '处理完成'}
+            </p>
+          </div>
 
           {/* 超时提示 */}
-          {isTimeout && taskData.status !== 'completed' && taskData.status !== 'failed' && (
-            <div className="kenya-card bg-yellow-50 border-l-4 border-yellow-500">
-              <div className="flex items-start gap-3">
-                <div className="text-2xl">⏰</div>
-                <div className="flex-1">
-                  <h3 className="font-medium text-yellow-800 mb-2">任务处理超时</h3>
-                  <p className="text-sm text-yellow-700 mb-4">
-                    任务已运行超过 10 分钟，可能遇到问题。建议刷新页面查看最新状态，或联系管理员。
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => window.location.reload()}
-                      className="kenya-button text-sm"
-                    >
-                      刷新页面
-                    </button>
-                    <button
-                      onClick={() => navigate('/')}
-                      className="kenya-button-secondary text-sm"
-                    >
-                      返回首页
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {isTimeout && (
+            <ErrorState
+              title="处理超时"
+              message="任务处理时间超过 10 分钟，请刷新页面查看最新状态或返回首页"
+              actions={[
+                <SecondaryButton key="refresh" onClick={() => window.location.reload()}>
+                  刷新页面
+                </SecondaryButton>,
+                <SecondaryButton key="home" onClick={() => navigate('/')}>
+                  返回首页
+                </SecondaryButton>
+              ]}
+            />
           )}
 
-          {/* 压缩阶段 */}
-          <div className="kenya-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl
-                  ${taskData.current_layer === 'compressing' ? 'bg-kenya-line text-white animate-pulse' : 
-                    taskData.current_layer && taskData.current_layer !== 'pending' && taskData.current_layer !== 'compressing' ? 'bg-kenya-dark text-white' : 
-                    'bg-kenya-line/30 text-kenya-dark/50'}`}>
-                  📝
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg">文本压缩</h3>
-                  <p className="text-sm text-kenya-dark/60">使用 Gemini 压缩原始文本，保留关键信息</p>
-                </div>
-              </div>
-              <div className="text-sm text-kenya-dark/60">
-                {taskData.current_layer === 'compressing' && '处理中...'}
-                {taskData.current_layer === 'compression_failed' && '❌ 失败'}
-                {taskData.current_layer && taskData.current_layer !== 'pending' && taskData.current_layer !== 'compressing' && taskData.current_layer !== 'compression_failed' && '✓ 已完成'}
-                {(taskData.current_layer === 'pending' || !taskData.current_layer) && '等待中'}
-              </div>
-            </div>
-          </div>
+          {/* 失败提示 */}
+          {taskData.status === 'failed' && (
+            <ErrorState
+              title="任务失败"
+              message={taskData.error_message || '任务处理失败，请重试'}
+              actions={[
+                <SecondaryButton key="retry" onClick={() => navigate('/upload')}>
+                  创建新任务
+                </SecondaryButton>,
+                <SecondaryButton key="home" onClick={() => navigate('/')}>
+                  返回首页
+                </SecondaryButton>
+              ]}
+            />
+          )}
 
-          {/* Layer 1 */}
-          <div className="kenya-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl
-                  ${getLayerStatus(1) === 'completed' ? 'bg-kenya-dark text-white' : 
-                    getLayerStatus(1) === 'processing' ? 'bg-kenya-line text-white animate-pulse' : 
-                    'bg-kenya-line/30 text-kenya-dark/50'}`}>
-                  1
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg">第一层：段落索引</h3>
-                  <p className="text-sm text-kenya-dark/60">识别段落类型，构建内容索引</p>
-                </div>
-              </div>
-              <div className="text-sm text-kenya-dark/60">
-                {getLayerStatus(1) === 'completed' && '✓ 已完成'}
-                {getLayerStatus(1) === 'processing' && '处理中...'}
-                {getLayerStatus(1) === 'pending' && '等待中'}
-              </div>
-            </div>
-            
-            {taskData.layer1_result && (
-              <div className="mt-4 pt-4 border-t border-kenya-line/30">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-kenya-dark/60">
-                    识别段落数：{taskData.layer1_result.paragraph_count}
-                    <span className="ml-4">完成时间：{formatDate(taskData.layer1_result.completed_at)}</span>
-                  </div>
-                  <button 
-                    onClick={() => navigate(`/result/${id}?layer=1`)}
-                    className="text-sm text-kenya-dark hover:underline"
-                  >
-                    查看结果 →
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* 停止提示 */}
+          {taskData.status === 'stopped' && (
+            <ErrorState
+              title="任务已停止"
+              message={taskData.error_message || '任务已被手动停止'}
+              actions={[
+                <SecondaryButton key="retry" onClick={() => navigate('/upload')}>
+                  创建新任务
+                </SecondaryButton>,
+                <SecondaryButton key="home" onClick={() => navigate('/')}>
+                  返回首页
+                </SecondaryButton>
+              ]}
+            />
+          )}
 
-          {/* Layer 2 */}
-          <div className="kenya-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl
-                  ${getLayerStatus(2) === 'completed' ? 'bg-kenya-dark text-white' : 
-                    getLayerStatus(2) === 'processing' ? 'bg-kenya-line text-white animate-pulse' : 
-                    'bg-kenya-line/30 text-kenya-dark/50'}`}>
-                  2
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg">第二层：深度蒸馏</h3>
-                  <p className="text-sm text-kenya-dark/60">提取核心概念，构建知识结构</p>
-                </div>
-              </div>
-              <div className="text-sm text-kenya-dark/60">
-                {getLayerStatus(2) === 'completed' && '✓ 已完成'}
-                {getLayerStatus(2) === 'processing' && '处理中...'}
-                {getLayerStatus(2) === 'pending' && '等待中'}
-              </div>
+          {/* 完成提示 */}
+          {taskData.status === 'completed' && (
+            <div className="text-center py-8">
+              <div className="text-6xl mb-4">✅</div>
+              <p className="text-kenya-dark text-lg font-medium mb-2">蒸馏完成！</p>
+              <p className="text-kenya-dark/60 text-sm mb-6">正在跳转到结果页...</p>
+              <SecondaryButton onClick={() => navigate(`/result/${id}`)}>
+                立即查看结果
+              </SecondaryButton>
             </div>
-            
-            {taskData.layer2_result && (
-              <div className="mt-4 pt-4 border-t border-kenya-line/30">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-kenya-dark/60">
-                    完成时间：{formatDate(taskData.layer2_result.completed_at)}
-                  </div>
-                  <button 
-                    onClick={() => navigate(`/result/${id}?layer=2`)}
-                    className="text-sm text-kenya-dark hover:underline"
-                  >
-                    查看结果 →
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Layer 3 */}
-          <div className="kenya-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl
-                  ${getLayerStatus(3) === 'completed' ? 'bg-kenya-dark text-white' : 
-                    getLayerStatus(3) === 'processing' ? 'bg-kenya-line text-white animate-pulse' : 
-                    'bg-kenya-line/30 text-kenya-dark/50'}`}>
-                  3
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg">第三层：表达策略分析</h3>
-                  <p className="text-sm text-kenya-dark/60">提取表达模式和标志性短语</p>
-                </div>
-              </div>
-              <div className="text-sm text-kenya-dark/60">
-                {getLayerStatus(3) === 'completed' && '✓ 已完成'}
-                {getLayerStatus(3) === 'processing' && '处理中...'}
-                {getLayerStatus(3) === 'pending' && '等待中'}
-              </div>
-            </div>
-            
-            {taskData.layer3_result && (
-              <div className="mt-4 pt-4 border-t border-kenya-line/30">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-kenya-dark/60">
-                    完成时间：{formatDate(taskData.layer3_result.completed_at)}
-                  </div>
-                  <button 
-                    onClick={() => navigate(`/result/${id}?layer=3`)}
-                    className="text-sm text-kenya-dark hover:underline"
-                  >
-                    查看结果 →
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Layer 4 */}
-          <div className="kenya-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-serif text-xl
-                  ${getLayerStatus(4) === 'completed' ? 'bg-kenya-dark text-white' : 
-                    getLayerStatus(4) === 'processing' ? 'bg-kenya-line text-white animate-pulse' : 
-                    'bg-kenya-line/30 text-kenya-dark/50'}`}>
-                  4
-                </div>
-                <div>
-                  <h3 className="font-medium text-lg">第四层：认知操作系统</h3>
-                  <p className="text-sm text-kenya-dark/60">整合为可执行的认知规则集</p>
-                </div>
-              </div>
-              <div className="text-sm text-kenya-dark/60">
-                {getLayerStatus(4) === 'completed' && '✓ 已完成'}
-                {getLayerStatus(4) === 'processing' && '处理中...'}
-                {getLayerStatus(4) === 'pending' && '等待中'}
-              </div>
-            </div>
-            
-            {taskData.cognitive_profile && (
-              <div className="mt-4 pt-4 border-t border-kenya-line/30">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-kenya-dark/60">
-                    认知系统已生成
-                  </div>
-                  <button 
-                    onClick={() => navigate(`/result/${id}?layer=4`)}
-                    className="text-sm text-kenya-dark hover:underline"
-                  >
-                    查看结果 →
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 操作按钮 */}
-          <div className="flex gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="kenya-button-secondary"
-            >
-              返回首页
-            </button>
-            
-            {taskData.status === 'completed' && (
-              <button
-                onClick={() => navigate(`/result/${id}`)}
-                className="kenya-button flex-1"
-              >
-                查看完整结果
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+          )}
+        </ResultCard>
+      </PageContainer>
     </div>
   );
 }
