@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+import Header from '../components/Header';
 
 export default function HomePage() {
   const [tasks, setTasks] = useState([]);
@@ -117,6 +118,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-kenya-brown">
+      <Header />
+      
       {/* Hero 区域 */}
       <div className="bg-kenya-cream py-20">
         <div className="max-w-6xl mx-auto px-6">

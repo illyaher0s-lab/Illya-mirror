@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+import Header from '../components/Header';
 
 export default function UploadPage() {
   const navigate = useNavigate();
@@ -83,9 +84,18 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-kenya-brown">
+      <Header />
+      
       {/* Hero 区域 */}
       <div className="bg-kenya-cream py-12">
         <div className="max-w-4xl mx-auto px-6">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-kenya-dark/60 hover:text-kenya-dark transition-colors mb-4"
+          >
+            <span>←</span>
+            <span className="text-sm">返回首页</span>
+          </button>
           <h1 className="font-serif text-5xl mb-2">创建蒸馏任务</h1>
           <p className="text-kenya-dark/70">上传文本内容,开始认知结构提取</p>
         </div>

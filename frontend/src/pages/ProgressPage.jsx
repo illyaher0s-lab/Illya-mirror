@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+import Header from '../components/Header';
 
 export default function ProgressPage() {
   const { id } = useParams();
@@ -117,9 +118,18 @@ export default function ProgressPage() {
 
   return (
     <div className="min-h-screen bg-kenya-brown">
+      <Header />
+      
       {/* Hero 区域 */}
       <div className="bg-kenya-cream py-12">
         <div className="max-w-6xl mx-auto px-6">
+          <button
+            onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-kenya-dark/60 hover:text-kenya-dark transition-colors mb-4"
+          >
+            <span>←</span>
+            <span className="text-sm">返回首页</span>
+          </button>
           <h1 className="font-serif text-5xl mb-2">{taskData.title}</h1>
           <div className="flex items-center gap-4 text-kenya-dark/70">
             <span>任务 ID: {id}</span>
