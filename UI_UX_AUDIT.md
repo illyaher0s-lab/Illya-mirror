@@ -181,6 +181,50 @@
 
 ## 修改计划（按阶段执行）
 
+### 🔴 阶段 0: 信息架构修复（最高优先级，新增）✅ 已完成
+
+**问题根源**: 违反 ui-ux-pro-max 的三条核心导航规则：
+1. `persistent-nav` — 核心导航必须始终可达 ❌
+2. `navigation-consistency` — 导航位置必须一致 ❌
+3. `back-behavior` — 返回行为必须可预测 ❌
+
+**当前问题**：
+- 所有页面都没有全局导航栏
+- 返回按钮位置不一致（有的在顶部，有的在底部）
+- 用户在深层页面（ResultPage）无法直接返回首页
+- 没有面包屑导航，用户不知道"我在哪"
+
+**修复任务**：
+
+- [x] 1. 创建全局导航栏（Header 组件）
+  - 包含：Logo + "镜像" + "首页"链接
+  - 固定在所有页面顶部
+  - 保持 Kenya Hara 极简风格
+  
+- [x] 2. 统一返回按钮位置和逻辑
+  - 所有非首页页面左上角添加"← 返回"按钮
+  - 返回逻辑：
+    * UploadPage → HomePage
+    * ProgressPage → HomePage
+    * ResultPage → ProgressPage
+  
+- [ ] 3. 添加面包屑导航（可选，暂不实现）
+  - 在深层页面（ProgressPage, ResultPage）显示路径
+  - 格式：首页 > 任务详情 > 结果
+
+**完成标准**：
+- ✅ 用户在任何页面都能一键返回首页
+- ✅ 导航位置在所有页面保持一致
+- ✅ 用户知道"我在哪、我能去哪、下一步做什么"
+- ✅ 符合 ui-ux-pro-max Rule 9 (Navigation Patterns) 的所有要求
+
+**修改详情**：
+- 新增文件：`frontend/src/components/Header.jsx`
+- 修改文件：`HomePage.jsx`, `UploadPage.jsx`, `ProgressPage.jsx`, `ResultPage.jsx`
+- 提交: `301b60c` (2026-05-13)
+
+---
+
 ### 阶段 1: P0 问题修复（阻碍核心功能）✅ 已完成
 
 - [x] 1. 修复首页任务列表的按钮逻辑
