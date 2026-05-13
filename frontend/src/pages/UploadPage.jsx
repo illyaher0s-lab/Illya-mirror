@@ -94,13 +94,6 @@ export default function UploadPage() {
       {/* 表单区域 */}
       <div className="max-w-4xl mx-auto px-6 py-12">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 错误提示 */}
-          {error && (
-            <div className="kenya-card bg-red-50 border-l-4 border-red-500">
-              <p className="text-red-700">{error}</p>
-            </div>
-          )}
-
           {/* 任务标题 */}
           <div className="kenya-card">
             <label className="block mb-2 font-medium">任务标题</label>
@@ -164,14 +157,14 @@ export default function UploadPage() {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="px-6 py-3 border border-kenya-line hover:bg-kenya-dark/5 transition-colors"
+              className="kenya-button-secondary"
               disabled={loading}
             >
               取消
             </button>
             <button 
               type="submit" 
-              className="kenya-button flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="kenya-button flex-1"
               disabled={loading || !isValidLength}
             >
               {loading ? '创建中...' : '开始蒸馏'}

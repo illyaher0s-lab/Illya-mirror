@@ -745,34 +745,34 @@ export default function ResultPage() {
         <div className="flex gap-4">
           <button
             onClick={() => handleExport('json')}
-            className="px-6 py-3 bg-kenya-dark text-white hover:bg-kenya-dark/90 transition-colors disabled:opacity-50"
+            className="kenya-button disabled:opacity-50"
             disabled={exporting}
           >
             {exporting ? '导出中...' : '导出 JSON'}
           </button>
           <button
             onClick={() => handleExport('markdown')}
-            className="px-6 py-3 border border-kenya-line hover:bg-kenya-dark/5 transition-colors disabled:opacity-50"
+            className="kenya-button-secondary disabled:opacity-50"
             disabled={exporting}
           >
             {exporting ? '导出中...' : '导出 Markdown'}
           </button>
           <button
             onClick={() => handleExport('txt')}
-            className="px-6 py-3 border border-kenya-line hover:bg-kenya-dark/5 transition-colors disabled:opacity-50"
+            className="kenya-button-secondary disabled:opacity-50"
             disabled={exporting}
           >
             {exporting ? '导出中...' : '导出 TXT'}
           </button>
           <button
             onClick={() => navigate(`/progress/${id}`)}
-            className="px-6 py-3 border border-kenya-line hover:bg-kenya-dark/5 transition-colors ml-auto"
+            className="kenya-button-secondary ml-auto"
           >
             返回进度页
           </button>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 border border-kenya-line hover:bg-kenya-dark/5 transition-colors"
+            className="kenya-button-secondary"
           >
             返回首页
           </button>

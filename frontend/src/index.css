@@ -17,23 +17,68 @@
     padding: 30px;
   }
 
-  /* Kenya Hara 风格按钮 */
+  /* Kenya Hara 风格按钮 - Primary（主操作） */
   .kenya-button {
     background: #2B2B2B;
     color: white;
     padding: 12px 24px;
     border-radius: 0;
-    transition: transform 0.3s ease;
+    transition: opacity 0.2s ease;
     border: none;
     cursor: pointer;
   }
   
   .kenya-button:hover {
-    transform: scale(1.05);
+    opacity: 0.9;
   }
   
   .kenya-button:active {
-    transform: scale(0.95);
+    opacity: 0.8;
+  }
+
+  .kenya-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Kenya Hara 风格按钮 - Secondary（次要操作） */
+  .kenya-button-secondary {
+    background: rgba(255, 255, 255, 0.5);
+    color: #2B2B2B;
+    padding: 12px 24px;
+    border-radius: 0;
+    border: 1px solid #8B7D6F;
+    transition: background 0.2s ease;
+    cursor: pointer;
+  }
+
+  .kenya-button-secondary:hover {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .kenya-button-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Kenya Hara 风格按钮 - Danger（危险操作） */
+  .kenya-button-danger {
+    background: transparent;
+    color: #DC2626;
+    padding: 12px 24px;
+    border-radius: 0;
+    border: none;
+    transition: background 0.2s ease;
+    cursor: pointer;
+  }
+
+  .kenya-button-danger:hover {
+    background: #FEE2E2;
+  }
+
+  .kenya-button-danger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   /* Kenya Hara 风格输入框 */

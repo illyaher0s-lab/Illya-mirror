@@ -120,12 +120,22 @@ export default function HomePage() {
       {/* Hero 区域 */}
       <div className="bg-kenya-cream py-20">
         <div className="max-w-6xl mx-auto px-6">
-          <h1 className="font-serif text-[80px] leading-tight mb-4">
+          <h1 className="font-serif text-5xl md:text-6xl leading-tight mb-4">
             镜像
           </h1>
-          <p className="text-lg text-kenya-dark/70">
-            从非结构化文本中提取认知结构，让 AI 理解一个人的思维方式
+          <p className="text-xl text-kenya-dark/80 mb-2">
+            让 AI 像你一样思考
           </p>
+          <p className="text-lg text-kenya-dark/70 mb-6">
+            上传你的笔记、对话记录或文章，生成可注入 AI 的认知规则集
+          </p>
+          <div className="flex gap-4">
+            <Link to="/upload">
+              <button className="kenya-button">
+                开始使用
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -250,7 +260,7 @@ export default function HomePage() {
                       {/* 根据任务状态显示主操作按钮 */}
                       {(task.status === 'pending' || task.current_layer?.includes('running') || task.current_layer === 'compressing') && (
                         <Link to={`/progress/${task.id}`}>
-                          <button className="px-4 py-2 text-sm bg-kenya-dark text-white hover:opacity-90 transition-opacity">
+                          <button className="kenya-button text-sm">
                             查看进度
                           </button>
                         </Link>
@@ -258,7 +268,7 @@ export default function HomePage() {
                       
                       {task.status === 'completed' && (
                         <Link to={`/result/${task.id}`}>
-                          <button className="px-4 py-2 text-sm bg-kenya-dark text-white hover:opacity-90 transition-opacity">
+                          <button className="kenya-button text-sm">
                             查看结果
                           </button>
                         </Link>
@@ -266,7 +276,7 @@ export default function HomePage() {
 
                       {(task.status === 'failed' || task.status === 'stopped') && (
                         <Link to={`/progress/${task.id}`}>
-                          <button className="px-4 py-2 text-sm bg-kenya-dark text-white hover:opacity-90 transition-opacity">
+                          <button className="kenya-button text-sm">
                             查看错误
                           </button>
                         </Link>
@@ -274,7 +284,7 @@ export default function HomePage() {
 
                       <button
                         onClick={() => handleDelete(task.id)}
-                        className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="kenya-button-danger text-sm"
                       >
                         删除
                       </button>

@@ -172,7 +172,8 @@ export default function ProgressPage() {
                   <p className="text-sm text-red-700 mb-4">{taskData.error_message}</p>
                   <button
                     onClick={() => navigate('/')}
-                    className="px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700 transition-colors"
+                    className="kenya-button text-sm"
+                    style={{ background: '#DC2626' }}
                   >
                     返回首页重试
                   </button>
@@ -193,7 +194,7 @@ export default function ProgressPage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-lg">文本压缩</h3>
-                  <p className="text-sm text-kenya-dark/60">使用 Claude 压缩原始文本，保留关键信息</p>
+                  <p className="text-sm text-kenya-dark/60">使用 Gemini 压缩原始文本，保留关键信息</p>
                 </div>
               </div>
               <div className="text-sm text-kenya-dark/60">
@@ -366,7 +367,7 @@ export default function ProgressPage() {
           <div className="flex gap-4">
             <button
               onClick={() => navigate('/')}
-              className="px-6 py-3 border border-kenya-line hover:bg-kenya-dark/5 transition-colors"
+              className="kenya-button-secondary"
             >
               返回首页
             </button>
