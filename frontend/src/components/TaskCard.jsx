@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import StatusBadge from './StatusBadge';
 import SecondaryButton from './SecondaryButton';
-import DangerButton from './DangerButton';
+import TertiaryButton from './TertiaryButton';
 
 export default function TaskCard({ task, onDelete }) {
   const navigate = useNavigate();
@@ -30,30 +30,40 @@ export default function TaskCard({ task, onDelete }) {
   };
 
   return (
-    <div className="bg-white border border-kenya-line rounded-lg p-6 hover:shadow-sm transition-shadow">
-      <div className="flex items-start justify-between mb-4">
+    <div className="bg-white border border-kenya-line rounded-lg py-4 px-5 hover:bg-kenya-cream transition-all duration-100 group">
+      <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-kenya-dark mb-2">{task.name}</h3>
-          <StatusBadge status={task.status} />
+          <h3 className="text-lg font-medium text-kenya-dark mb-2">{task.name}</h3>
+          <div className="flex items-center gap-3">
+            <StatusBadge status={task.status} />
+            <span className="text-sm text-kenya-dark/60">
+              {formatDate(task.updated_at)}
+            </span>
+          </div>
         </div>
         <div className="flex gap-2">
-          {(task.status === 'completed' || task.status === 'processing' || task.status === 'pending') && (
+          {task.status === 'completed' && (
             <SecondaryButton size="sm" onClick={handleViewResult}>
-              {task.status === 'completed' ? '查看结果' : '查看进度'}
+              查看结果
             </SecondaryButton>
           )}
-          <DangerButton size="sm" onClick={() => onDelete(task.id)}>
+          {(task.status === 'processing' || task.status === 'pending') && (
+            <button 
+              onClick={handleViewResult}
+              className="flex items-center gap-1 text-sm text-kenya-dark/60 hover:text-kenya-dark transition-colors"
+            >
+              <span>查看进度</span>
+              <span>→</span>
+            </button>
+          )}
+          <TertiaryButton size="sm" onClick={() => onDelete(task.id)} className="opacity-0 group-hover:opacity-100">
             删除
-          </DangerButton>
+          </TertiaryButton>
         </div>
-      </div>
-
-      <div className="text-sm text-kenya-dark/60 mb-3">
-        最后更新：{formatDate(task.updated_at)}
       </div>
 
       {task.status === 'processing' && task.current_layer && (
-        <div className="mt-4">
+        <div className="mt-3">
           <div className="flex items-center justify-between text-sm text-kenya-dark/60 mb-2">
             <span>正在处理第 {task.current_layer} 层</span>
             <span>{Math.round((task.current_layer / 4) * 100)}%</span>

@@ -7,7 +7,9 @@ import PageContainer from '../components/PageContainer';
 import PageTitle from '../components/PageTitle';
 import ResultCard from '../components/ResultCard';
 import LayerTabs from '../components/LayerTabs';
+import SegmentedControl from '../components/SegmentedControl';
 import SecondaryButton from '../components/SecondaryButton';
+import TertiaryButton from '../components/TertiaryButton';
 import EmptyState from '../components/EmptyState';
 import LoadingState from '../components/LoadingState';
 import ErrorState from '../components/ErrorState';
@@ -106,19 +108,30 @@ export default function ResultPage() {
         </div>
 
         <div className="space-y-3">
-          {data.paragraph_index.map((item, idx) => (
-            <div key={idx} className="p-4 bg-kenya-dark/5 border-l-4 border-kenya-line rounded">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="px-2 py-1 text-xs bg-kenya-dark text-white rounded">
-                  {item.type}
-                </span>
-                <span className="font-medium text-base">{item.title}</span>
+          {data.paragraph_index.map((item, idx) => {
+            const typeColors = {
+              '判断型': { border: 'border-l-[3px] border-[#E8593C]', badge: 'bg-[rgba(232,89,60,0.1)] text-[#C04828]' },
+              '推理型': { border: 'border-l-[3px] border-[#3B8BD4]', badge: 'bg-[rgba(59,139,212,0.1)] text-[#185FA5]' },
+              '叙述型': { border: 'border-l-[3px] border-[#3B6D11]', badge: 'bg-[rgba(59,109,17,0.1)] text-[#2D5209]' },
+              '提问型': { border: 'border-l-[3px] border-[#854F0B]', badge: 'bg-[rgba(133,79,11,0.1)] text-[#6B3F08]' },
+              '反思型': { border: 'border-l-[3px] border-[#533AB7]', badge: 'bg-[rgba(83,58,183,0.1)] text-[#3F2C8A]' }
+            };
+            const colors = typeColors[item.type] || { border: 'border-l-4 border-kenya-line', badge: 'bg-kenya-dark text-kenya-cream' };
+            
+            return (
+              <div key={idx} className={`p-4 bg-kenya-dark/5 rounded ${colors.border}`}>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className={`px-2 py-1 text-xs border border-current rounded ${colors.badge}`}>
+                    {item.type}
+                  </span>
+                  <span className="font-medium text-base">{item.title}</span>
+                </div>
+                {item.full_text && (
+                  <p className="text-sm text-kenya-dark/90 leading-6">{item.full_text}</p>
+                )}
               </div>
-              {item.full_text && (
-                <p className="text-sm text-kenya-dark/70 leading-6">{item.full_text}</p>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );
@@ -155,7 +168,7 @@ export default function ResultPage() {
         {data.reasoning_patterns && data.reasoning_patterns.map((pattern, idx) => (
           <div key={idx} className="p-6 bg-white border border-kenya-line rounded-lg">
             <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 text-sm bg-kenya-dark text-white rounded">
+              <span className="px-3 py-1 text-sm bg-kenya-dark text-kenya-cream border border-kenya-dark rounded">
                 {pattern.id}
               </span>
               <h4 className="text-lg font-medium">{pattern.name}</h4>
@@ -246,7 +259,7 @@ export default function ResultPage() {
         {data.expression_strategies && data.expression_strategies.map((strategy, idx) => (
           <div key={idx} className="p-6 bg-white border border-kenya-line rounded-lg">
             <div className="flex items-center gap-3 mb-4">
-              <span className="px-3 py-1 text-sm bg-kenya-dark text-white rounded">
+              <span className="px-3 py-1 text-sm bg-kenya-dark text-kenya-cream border border-kenya-dark rounded">
                 {strategy.id}
               </span>
               <h4 className="text-lg font-medium">{strategy.name}</h4>
@@ -343,7 +356,7 @@ export default function ResultPage() {
               {data.core_assumptions.map((assumption, idx) => (
                 <div key={idx} className="p-4 bg-kenya-dark/5 border-l-4 border-kenya-line rounded">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="px-2 py-1 text-xs bg-kenya-dark text-white rounded">
+                    <span className="px-2 py-1 text-xs bg-kenya-dark text-kenya-cream border border-kenya-dark rounded">
                       {assumption.id}
                     </span>
                     <span className={`px-2 py-1 text-xs rounded ${
@@ -356,6 +369,181 @@ export default function ResultPage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {data.reasoning_engine && (
+          <div className="p-6 bg-white border border-kenya-line rounded-lg">
+            <h4 className="text-lg font-medium mb-4">推理引擎</h4>
+            {data.reasoning_engine.description && (
+              <div className="mb-4">
+                <span className="text-sm font-medium text-kenya-dark/70">整体风格：</span>
+                <span className="text-sm text-kenya-dark/90">{data.reasoning_engine.description}</span>
+              </div>
+            )}
+            {data.reasoning_engine.patterns && Array.isArray(data.reasoning_engine.patterns) && data.reasoning_engine.patterns.length > 0 && (
+              <div className="space-y-3">
+                <div className="text-sm font-medium text-kenya-dark/70">推理模式：</div>
+                {data.reasoning_engine.patterns.map((pattern, idx) => (
+                  <div key={idx} className="p-4 bg-kenya-dark/5 border-l-4 border-kenya-line rounded">
+                    <div className="flex items-center gap-3 mb-2">
+                      {pattern.id && (
+                        <span className="px-2 py-1 text-xs bg-kenya-dark text-kenya-cream rounded">
+                          {pattern.id}
+                        </span>
+                      )}
+                      {pattern.name && (
+                        <span className="font-medium text-base">{pattern.name}</span>
+                      )}
+                    </div>
+                    {pattern.trigger && (
+                      <div className="mb-2">
+                        <span className="text-sm font-medium text-kenya-dark/70">触发条件：</span>
+                        <span className="text-sm text-kenya-dark/90">{pattern.trigger}</span>
+                      </div>
+                    )}
+                    {pattern.steps && Array.isArray(pattern.steps) && pattern.steps.length > 0 && (
+                      <div>
+                        <div className="text-sm font-medium text-kenya-dark/70 mb-1">推理步骤：</div>
+                        <ol className="list-decimal list-inside space-y-1 text-sm text-kenya-dark/90">
+                          {pattern.steps.map((step, i) => (
+                            <li key={i}>{step}</li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {data.expression_engine && (
+          <div className="p-6 bg-white border border-kenya-line rounded-lg">
+            <h4 className="text-lg font-medium mb-4">表达引擎</h4>
+            {data.expression_engine.description && (
+              <div className="mb-4">
+                <span className="text-sm font-medium text-kenya-dark/70">整体风格：</span>
+                <span className="text-sm text-kenya-dark/90">{data.expression_engine.description}</span>
+              </div>
+            )}
+            
+            {data.expression_engine.strategies && Array.isArray(data.expression_engine.strategies) && data.expression_engine.strategies.length > 0 && (
+              <div className="mb-6">
+                <div className="text-sm font-medium text-kenya-dark/70 mb-3">表达策略：</div>
+                <div className="space-y-3">
+                  {data.expression_engine.strategies.map((strategy, idx) => (
+                    <div key={idx} className="p-4 bg-kenya-dark/5 border-l-4 border-kenya-line rounded">
+                      <div className="flex items-center gap-3 mb-2">
+                        {strategy.id && (
+                          <span className="px-2 py-1 text-xs bg-kenya-dark text-kenya-cream rounded">
+                            {strategy.id}
+                          </span>
+                        )}
+                        {strategy.name && (
+                          <span className="font-medium text-base">{strategy.name}</span>
+                        )}
+                      </div>
+                      {strategy.how && (
+                        <div className="mb-2">
+                          <span className="text-sm font-medium text-kenya-dark/70">如何使用：</span>
+                          <span className="text-sm text-kenya-dark/90">{strategy.how}</span>
+                        </div>
+                      )}
+                      {strategy.when_to_use && (
+                        <div>
+                          <span className="text-sm font-medium text-kenya-dark/70">使用时机：</span>
+                          <span className="text-sm text-kenya-dark/90">{strategy.when_to_use}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {data.expression_engine.silence_rules && Array.isArray(data.expression_engine.silence_rules) && data.expression_engine.silence_rules.length > 0 && (
+              <div className="mb-6">
+                <div className="text-sm font-medium text-kenya-dark/70 mb-3">沉默策略：</div>
+                <div className="space-y-2">
+                  {data.expression_engine.silence_rules.map((rule, idx) => (
+                    <div key={idx} className="p-3 bg-kenya-dark/5 rounded">
+                      {rule.avoid && (
+                        <div className="mb-1">
+                          <span className="text-sm font-medium text-kenya-dark/70">避免：</span>
+                          <span className="text-sm text-kenya-dark/90">{rule.avoid}</span>
+                        </div>
+                      )}
+                      {rule.reason && (
+                        <div>
+                          <span className="text-sm font-medium text-kenya-dark/70">原因：</span>
+                          <span className="text-sm text-kenya-dark/90">{rule.reason}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {data.expression_engine.signature_phrases && Array.isArray(data.expression_engine.signature_phrases) && data.expression_engine.signature_phrases.length > 0 && (
+              <div>
+                <div className="text-sm font-medium text-kenya-dark/70 mb-3">标志性表达：</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {data.expression_engine.signature_phrases.map((phrase, idx) => (
+                    <div key={idx} className="p-3 bg-kenya-dark/5 rounded">
+                      <div className="flex items-center gap-2 mb-1">
+                        {phrase.phrase && (
+                          <span className="font-medium text-kenya-dark">{phrase.phrase}</span>
+                        )}
+                      </div>
+                      {phrase.use_when && (
+                        <div className="text-sm text-kenya-dark/70">{phrase.use_when}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {data.usage_instructions && (
+          <div className="p-6 bg-white border border-kenya-line rounded-lg">
+            <h4 className="text-lg font-medium mb-4">使用说明</h4>
+            {typeof data.usage_instructions === 'string' ? (
+              <div className="prose prose-sm max-w-none">
+                <p className="text-sm text-kenya-dark/90 whitespace-pre-wrap">{data.usage_instructions}</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {data.usage_instructions.for_new_question && (
+                  <div>
+                    <div className="text-sm font-medium text-kenya-dark mb-2">新问题处理：</div>
+                    <p className="text-sm text-kenya-dark/90 whitespace-pre-wrap">{data.usage_instructions.for_new_question}</p>
+                  </div>
+                )}
+                {data.usage_instructions.for_expression_task && (
+                  <div>
+                    <div className="text-sm font-medium text-kenya-dark mb-2">表达任务：</div>
+                    <p className="text-sm text-kenya-dark/90 whitespace-pre-wrap">{data.usage_instructions.for_expression_task}</p>
+                  </div>
+                )}
+                {data.usage_instructions.for_opinion_judgment && (
+                  <div>
+                    <div className="text-sm font-medium text-kenya-dark mb-2">观点判断：</div>
+                    <p className="text-sm text-kenya-dark/90 whitespace-pre-wrap">{data.usage_instructions.for_opinion_judgment}</p>
+                  </div>
+                )}
+                {data.usage_instructions.default && (
+                  <div>
+                    <div className="text-sm font-medium text-kenya-dark mb-2">默认处理：</div>
+                    <p className="text-sm text-kenya-dark/90 whitespace-pre-wrap">{data.usage_instructions.default}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -470,18 +658,11 @@ export default function ResultPage() {
 
   return (
     <div className="min-h-screen bg-kenya-brown">
-      <AppHeader />
+      <AppHeader breadcrumb={taskData.name} />
 
       {/* Hero 区 */}
-      <div className="bg-kenya-cream py-12">
+      <div className="bg-kenya-cream py-10">
         <PageContainer>
-          <button
-            onClick={() => navigate(`/progress/${id}`)}
-            className="flex items-center gap-2 text-kenya-dark/60 hover:text-kenya-dark transition-colors mb-4 text-sm"
-          >
-            <span>←</span>
-            <span>返回进度页</span>
-          </button>
           <PageTitle
             title={taskData.name}
             subtitle="蒸馏结果"
@@ -503,51 +684,53 @@ export default function ResultPage() {
 
       {/* 结果区 */}
       <PageContainer>
-        <ResultCard>
-          {/* 层级切换 */}
-          <LayerTabs
-            layers={[1, 2, 3, 4]}
-            active={layer}
-            onChange={(newLayer) => setSearchParams({ layer: newLayer.toString() })}
-          />
+        <div className="max-w-5xl mx-auto">
+          <ResultCard>
+            {/* 层级切换 */}
+            <LayerTabs
+              layers={[1, 2, 3, 4]}
+              active={layer}
+              onChange={(newLayer) => setSearchParams({ layer: newLayer.toString() })}
+            />
 
-          {/* 内容类型切换 + 导出按钮 */}
-          <div className="flex items-center justify-between mt-6 mb-6">
-            <div className="flex gap-2">
-              <button
-                onClick={() => setActiveTab('content')}
-                className={`px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${
-                  activeTab === 'content'
-                    ? 'bg-kenya-dark text-white'
-                    : 'bg-white/50 hover:bg-white/70 text-kenya-dark'
-                }`}
-              >
-                📄 蒸馏内容
-              </button>
-              <button
-                onClick={() => setActiveTab('quality')}
-                className={`px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 ${
-                  activeTab === 'quality'
-                    ? 'bg-kenya-dark text-white'
-                    : 'bg-white/50 hover:bg-white/70 text-kenya-dark'
-                }`}
-              >
-                📊 质量报告
-              </button>
-            </div>
+            {/* 内容类型切换 + 导出按钮 */}
+            <div className="flex items-center justify-between mt-6 mb-6">
+              <SegmentedControl
+                options={[
+                  { value: 'content', label: '📄 蒸馏内容' },
+                  { value: 'quality', label: '📊 质量报告' }
+                ]}
+                active={activeTab}
+                onChange={setActiveTab}
+              />
 
-            <div className="flex gap-3">
-              <SecondaryButton size="sm" onClick={() => handleExport('json')} disabled={exporting}>
-                {exporting ? '导出中...' : '导出 JSON'}
-              </SecondaryButton>
-              <SecondaryButton size="sm" onClick={() => handleExport('markdown')} disabled={exporting}>
-                {exporting ? '导出中...' : '导出 Markdown'}
-              </SecondaryButton>
-              <SecondaryButton size="sm" onClick={() => handleExport('txt')} disabled={exporting}>
-                {exporting ? '导出中...' : '导出 TXT'}
-              </SecondaryButton>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handleExport('json')} 
+                  disabled={exporting}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border-[0.5px] border-kenya-line rounded-md hover:bg-kenya-cream transition-colors disabled:opacity-50"
+                >
+                  <span>↓</span>
+                  <span>{exporting ? '导出中...' : 'JSON'}</span>
+                </button>
+                <button 
+                  onClick={() => handleExport('markdown')} 
+                  disabled={exporting}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border-[0.5px] border-kenya-line rounded-md hover:bg-kenya-cream transition-colors disabled:opacity-50"
+                >
+                  <span>↓</span>
+                  <span>{exporting ? '导出中...' : 'Markdown'}</span>
+                </button>
+                <button 
+                  onClick={() => handleExport('txt')} 
+                  disabled={exporting}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs border-[0.5px] border-kenya-line rounded-md hover:bg-kenya-cream transition-colors disabled:opacity-50"
+                >
+                  <span>↓</span>
+                  <span>{exporting ? '导出中...' : 'TXT'}</span>
+                </button>
+              </div>
             </div>
-          </div>
 
           {/* 内容展示 */}
           {activeTab === 'content' && (
@@ -563,14 +746,12 @@ export default function ResultPage() {
 
           {/* 底部操作 */}
           <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-kenya-line">
-            <SecondaryButton onClick={() => navigate(`/progress/${id}`)}>
-              返回进度页
-            </SecondaryButton>
-            <SecondaryButton onClick={() => navigate('/')}>
+            <TertiaryButton onClick={() => navigate('/')}>
               返回首页
-            </SecondaryButton>
+            </TertiaryButton>
           </div>
         </ResultCard>
+        </div>
       </PageContainer>
     </div>
   );

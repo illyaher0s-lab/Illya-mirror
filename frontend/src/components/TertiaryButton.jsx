@@ -1,4 +1,4 @@
-export default function SecondaryButton({ 
+export default function TertiaryButton({ 
   children, 
   onClick, 
   disabled = false, 
@@ -14,8 +14,8 @@ export default function SecondaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
-      className={`bg-white text-kenya-dark border border-kenya-line rounded-lg font-medium
-                 hover:bg-kenya-cream active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
+      className={`bg-transparent text-kenya-dark border border-transparent rounded-lg font-medium
+                 hover:border-kenya-line hover:bg-kenya-cream active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed
                  transition-all duration-150 ${sizeClass} ${className}`}
     >
       {loading ? '处理中...' : children}

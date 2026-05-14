@@ -122,18 +122,11 @@ export default function ProgressPage() {
 
   return (
     <div className="min-h-screen bg-kenya-brown">
-      <AppHeader />
+      <AppHeader breadcrumb={taskData.name} />
 
       {/* Hero 区 */}
-      <div className="bg-kenya-cream py-12">
+      <div className="bg-kenya-cream py-10">
         <PageContainer>
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-kenya-dark/60 hover:text-kenya-dark transition-colors mb-4 text-sm"
-          >
-            <span>←</span>
-            <span>返回首页</span>
-          </button>
           <PageTitle
             title={taskData.name}
             subtitle="蒸馏进行中"
@@ -151,12 +144,12 @@ export default function ProgressPage() {
                 <div key={idx} className="flex items-center flex-1">
                   <div className="flex flex-col items-center flex-1">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-all ${
+                      className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-all border-2 ${
                         currentStep > idx
-                          ? 'bg-kenya-dark text-white'
+                          ? 'bg-kenya-dark text-kenya-cream border-kenya-dark'
                           : currentStep === idx
-                          ? 'bg-kenya-dark text-white animate-pulse'
-                          : 'bg-kenya-line/20 text-kenya-dark/40'
+                          ? 'bg-kenya-dark text-kenya-cream border-kenya-dark animate-pulse'
+                          : 'bg-kenya-line/20 text-kenya-dark/40 border-kenya-line/40'
                       }`}
                     >
                       {idx + 1}

@@ -1,7 +1,21 @@
 # Mirror Project - Agent Working Rules
 
-**Last Updated**: 2026-05-13  
+**Last Updated**: 2026-05-14  
 **Purpose**: 强制执行的代码修改和调试规范，防止低质量修复和隐性 bug。
+
+---
+
+## Rule 0 — Data First (数据优先)
+**任何涉及数据展示的功能，必须先查看真实 API 响应，再写代码。**
+
+**强制要求**：
+- 禁止根据"应该有什么字段"去猜测字段名
+- 如果用户没有提供真实数据，**主动要求提供**
+- 写完代码后，对照真实数据检查每个字段名
+
+**示例**：
+- ❌ 错误：看到 `expression_engine.strategies`，就猜测有 `strategy.description` 字段
+- ✅ 正确：先 `curl http://localhost:8000/api/distillations/{id} | jq '.cognitive_profile.expression_engine.strategies[0]'`，看到实际字段是 `how` 和 `when_to_use`，再写代码
 
 ---
 
@@ -36,6 +50,29 @@ Touch only what you must. Don't "improve" adjacent code, comments, or formatting
 **判断标准**：
 - Git diff 里每一行改动都能直接追溯到用户的请求
 - 如果有人问"为什么改这行"，你能立刻回答出来
+
+---
+
+## Git Workflow
+
+**分支策略**：
+- `main` 分支：稳定版本，只接受经过验证的代码
+- 功能开发：创建 `feature/功能名` 分支
+- Bug 修复：创建 `fix/问题描述` 分支
+
+**Commit 规范**：
+- 使用清晰的 commit message，说明改了什么和为什么
+- 示例：`fix: Layer 4 字段名与 API 响应不匹配`
+- 示例：`feat: 添加段落索引颜色编码`
+
+**合并前检查**：
+- 前端：`npm run build` 成功
+- 后端：所有 API 端点正常响应
+- 如果修改了数据展示逻辑，必须用真实数据验证
+
+**回滚策略**：
+- 如果修改导致严重 bug，立即 `git revert` 或切回上一个稳定 commit
+- 保持 `main` 分支随时可部署
 
 ---
 

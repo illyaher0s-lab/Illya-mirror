@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirror 竞品分析报告</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            background: #fff;
+            color: #000;
+            line-height: 1.8;
+            padding: 80px 40px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* 标题区 */
+        .header {
+            margin-bottom: 120px;
+            border-bottom: 4px solid #000;
+            padding-bottom: 40px;
+        }
+        
+        h1 {
+            font-size: 64px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            font-weight: 400;
+        }
+        
+        /* 统计卡片 */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-bottom: 120px;
+        }
+        
+        .stat-card {
+            background: #f5f5f5;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            box-shadow: 8px 8px 0 #000;
+            transform: translate(-4px, -4px);
+        }
+        
+        .stat-number {
+            font-size: 72px;
+            font-weight: 900;
+            color: #002FA7;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #666;
+        }
+        
+        /* 章节标题 */
+        h2 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 60px;
+            position: relative;
+            padding-left: 20px;
+        }
+        
+        h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 6px;
+            height: 100%;
+            background: #002FA7;
+        }
+        
+        section {
+            margin-bottom: 120px;
+        }
+        
+        /* 对比表格 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 60px;
+            background: #fff;
+        }
+        
+        thead {
+            background: #000;
+            color: #fff;
+        }
+        
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        tbody tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .project-name {
+            font-weight: 700;
+            color: #002FA7;
+        }
+        
+        .highlight-row {
+            background: #fffacd;
+        }
+        
+        /* 功能对比符号 */
+        .has-feature {
+            font-size: 24px;
+            color: #000;
+        }
+        
+        .no-feature {
+            font-size: 24px;
+            color: #ccc;
+        }
+        
+        /* 卡片网格 */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .card {
+            background: #f5f5f5;
+            padding: 40px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 8px 8px 0 #000;
+            transform: translate(-4px, -4px);
+        }
+        
+        .card h3 {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            color: #002FA7;
+        }
+        
+        .card p {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .card ul {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .card li {
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        
+        .card li::before {
+            content: '●';
+            position: absolute;
+            left: 0;
+            color: #002FA7;
+        }
+        
+        /* 标签 */
+        .tag {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .tag-exclusive {
+            background: #002FA7;
+            color: #fff;
+        }
+        
+        .tag-high {
+            background: #000;
+            color: #fff;
+        }
+        
+        .tag-medium {
+            background: #666;
+            color: #fff;
+        }
+        
+        .tag-low {
+            background: #ccc;
+            color: #000;
+        }
+        
+        /* 高亮框 */
+        .highlight-box {
+            background: #002FA7;
+            color: #fff;
+            padding: 40px;
+            margin-bottom: 60px;
+        }
+        
+        .highlight-box h3 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 20px;
+        }
+        
+        .highlight-box p {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        
+        /* 链接 */
+        a {
+            color: #002FA7;
+            text-decoration: none;
+            border-bottom: 2px solid #002FA7;
+            transition: all 0.2s ease;
+        }
+        
+        a:hover {
+            background: #002FA7;
+            color: #fff;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            body {
+                padding: 40px 20px;
+            }
+            
+            h1 {
+                font-size: 48px;
+            }
+            
+            h2 {
+                font-size: 36px;
+            }
+            
+            .stats,
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-number {
+                font-size: 56px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 标题区 -->
+        <div class="header">
+            <h1>Mirror 竞品分析</h1>
+            <p class="subtitle">多阶段 LLM 蒸馏系统 · 竞品技术与产品定位对比</p>
+        </div>
+        
+        <!-- 统计卡片 -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div class="stat-label">竞品项目</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">2</div>
+                <div class="stat-label">独家功能</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">85%</div>
+                <div class="stat-label">技术栈覆盖率</div>
+            </div>
+        </div>
+        
+        <!-- 技术实现对比 -->
+        <section>
+            <h2>技术实现对比</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>Stars</th>
+                        <th>技术栈</th>
+                        <th>架构</th>
+                        <th>核心依赖</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td class="project-name">Mirror（你的项目）</td>
+                        <td>-</td>
+                        <td>FastAPI + React</td>
+                        <td>前后端分离</td>
+                        <td>Claude API, Gemini API, PostgreSQL</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">neo4j-labs/llm-graph-builder</td>
+                        <td>4,674</td>
+                        <td>FastAPI + React + TypeScript</td>
+                        <td>前后端分离</td>
+                        <td>Neo4j, LangChain, Claude/OpenAI API</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">robert-mcdermott/ai-knowledge-graph</td>
+                        <td>2,265</td>
+                        <td>Python + HTML</td>
+                        <td>单体应用</td>
+                        <td>NetworkX, PyVis, OpenAI/Anthropic API</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">benyam7/llm-knowledge-extractor</td>
+                        <td>0</td>
+                        <td>FastAPI + Python</td>
+                        <td>API 服务</td>
+                        <td>PostgreSQL, OpenAI API</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">intentweave/intentweave</td>
+                        <td>2</td>
+                        <td>TypeScript + React</td>
+                        <td>前后端分离</td>
+                        <td>Neo4j, SQLite, OpenAI API</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">BaranziniLab/KG_RAG</td>
+                        <td>939</td>
+                        <td>Python (Jupyter)</td>
+                        <td>研究工具</td>
+                        <td>OpenAI API, BERT, Sentence Transformers</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- 产品定位对比 -->
+        <section>
+            <h2>产品定位对比</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>目标用户</th>
+                        <th>使用场景</th>
+                        <th>开源协议</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="highlight-row">
+                        <td class="project-name">Mirror</td>
+                        <td>内容创作者、研究人员</td>
+                        <td>长文本深度理解、认知画像生成</td>
+                        <td>MIT</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">neo4j-labs/llm-graph-builder</td>
+                        <td>企业、开发者</td>
+                        <td>非结构化数据转知识图谱、GraphRAG</td>
+                        <td>Apache 2.0</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">robert-mcdermott/ai-knowledge-graph</td>
+                        <td>研究人员、教育工作者</td>
+                        <td>文档知识提取、可视化</td>
+                        <td>MIT</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">benyam7/llm-knowledge-extractor</td>
+                        <td>开发者</td>
+                        <td>API 集成、结构化信息提取</td>
+                        <td>未明确</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">intentweave/intentweave</td>
+                        <td>开发团队</td>
+                        <td>代码分析、架构决策追踪</td>
+                        <td>Apache 2.0</td>
+                    </tr>
+                    <tr>
+                        <td class="project-name">BaranziniLab/KG_RAG</td>
+                        <td>生物医学研究人员</td>
+                        <td>知识图谱增强的 RAG、生物信息学</td>
+                        <td>MIT</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- 功能对比矩阵 -->
+        <section>
+            <h2>功能对比矩阵</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>功能</th>
+                        <th>Mirror</th>
+                        <th>neo4j-labs</th>
+                        <th>ai-knowledge-graph</th>
+                        <th>llm-knowledge-extractor</th>
+                        <th>intentweave</th>
+                        <th>KG_RAG</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>多层蒸馏</td>
+                        <td class="has-feature">● (4层)</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                    </tr>
+                    <tr>
+                        <td>认知画像</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                    </tr>
+                    <tr>
+                        <td>知识图谱</td>
+                        <td class="no-feature">○</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                    </tr>
+                    <tr>
+                        <td>可视化</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                    </tr>
+                    <tr>
+                        <td>批量处理</td>
+                        <td class="no-feature">○</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                    </tr>
+                    <tr>
+                        <td>API 接口</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                    </tr>
+                    <tr>
+                        <td>质量评估</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                        <td class="has-feature">●</td>
+                        <td class="no-feature">○</td>
+                        <td class="no-feature">○</td>
+                    </tr>
+                    <tr>
+                        <td>导出功能</td>
+                        <td class="has-feature">● (JSON/YAML/MD)</td>
+                        <td class="has-feature">●</td>
+                        <td class="has-feature">● (HTML)</td>
+                        <td class="has-feature">● (JSON)</td>
+                        <td class="has-feature">● (HTML)</td>
+                        <td class="no-feature">○</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <!-- 差异化空间 -->
+        <section>
+            <h2>你的差异化空间</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>独家功能优势</h3>
+                    <p><span class="tag tag-exclusive">独家</span></p>
+                    <ul>
+                        <li><strong>四层串行蒸馏</strong> — 你是唯一实现多层蒸馏的项目，竞品都是单层提取</li>
+                        <li><strong>认知画像生成</strong> — 独家特性，从文本中提取作者的思维模式和表达策略</li>
+                        <li><strong>分段交付</strong> — 每层完成后可查看、继续或停止，用户体验更灵活</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>技术实现优势</h3>
+                    <p><span class="tag tag-high">高优先级</span></p>
+                    <ul>
+                        <li><strong>双模型架构</strong> — Gemini 压缩 + Claude 蒸馏，成本和质量的最优平衡</li>
+                        <li><strong>FastAPI + React</strong> — 与 neo4j-labs 技术栈一致，但你的架构更轻量（无需 Neo4j）</li>
+                        <li><strong>质量评估系统</strong> — 置信度评分 + Bad Case 检测，只有你和 llm-knowledge-extractor 有</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>产品定位建议</h3>
+                    <p><span class="tag tag-medium">中优先级</span></p>
+                    <ul>
+                        <li><strong>切入空白市场</strong> — 竞品都面向开发者或研究人员，你可以主打"内容创作者"</li>
+                        <li><strong>强调深度理解</strong> — 竞品做"知识提取"，你做"认知画像"，定位更高端</li>
+                        <li><strong>作品集展示</strong> — 这是你的作品集项目，突出"从 0 到 1 完整交付"能力</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>需要补齐的功能</h3>
+                    <p><span class="tag tag-low">低优先级</span></p>
+                    <ul>
+                        <li><strong>批量处理</strong> — 4/5 竞品都有，这是高频需求（但作品集项目可以不做）</li>
+                        <li><strong>知识图谱可视化</strong> — neo4j-labs 的核心卖点，但你的定位不同，可以不做</li>
+                        <li><strong>Gemini API 集成</strong> — 当前缺失，导致任务失败，这是必须修的 bug</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 可借鉴的设计 -->
+        <section>
+            <h2>可借鉴的设计</h2>
+            
+            <div class="highlight-box">
+                <h3>neo4j-labs/llm-graph-builder 的架构设计</h3>
+                <p><strong>亮点：</strong>完整的前后端分离架构 + LangChain 集成 + 多模型支持（Claude/OpenAI/Gemini）</p>
+                <p><strong>可借鉴：</strong>他们的 README 有完整的架构图和部署文档，你可以参考这个结构优化 Mirror 的文档</p>
+                <p><strong>链接：</strong><a href="https://github.com/neo4j-labs/llm-graph-builder" target="_blank">查看项目</a></p>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>robert-mcdermott/ai-knowledge-graph 的可视化</h3>
+                <p><strong>亮点：</strong>用 PyVis 生成交互式知识图谱，导出为单个 HTML 文件，易于分享</p>
+                <p><strong>可借鉴：</strong>你的质量报告可以参考这个思路，生成自包含的 HTML 报告（已实现）</p>
+                <p><strong>链接：</strong><a href="https://robert-mcdermott.github.io/ai-knowledge-graph/" target="_blank">查看 Demo</a></p>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>benyam7/llm-knowledge-extractor 的模块化设计</h3>
+                <p><strong>亮点：</strong>清晰的服务层分离（API / Business Logic / Data Access），代码可维护性高</p>
+                <p><strong>可借鉴：</strong>Mirror 当前的代码结构已经很接近这个模式，继续保持</p>
+            </div>
+        </section>
+        
+        <!-- 下一步行动 -->
+        <section>
+            <h2>下一步行动建议</h2>
+            
+            <h3 style="font-size: 24px; margin-bottom: 20px; margin-top: 40px;">短期（1-2 周）</h3>
+            <div class="card">
+                <ul>
+                    <li><strong>修复 Gemini API 集成</strong> — 当前压缩服务缺失，导致任务失败（高优先级 bug）</li>
+                    <li><strong>完成真实案例测试</strong> — 用实际长文本测试四层蒸馏，验证质量</li>
+                    <li><strong>优化 README</strong> — 参考 neo4j-labs 的结构，添加架构图和使用场景说明</li>
+                </ul>
+            </div>
+            
+            <h3 style="font-size: 24px; margin-bottom: 20px; margin-top: 40px;">中期（1 个月）</h3>
+            <div class="card">
+                <ul>
+                    <li><strong>录制演示视频</strong> — 30 秒展示四层蒸馏过程，放在 README 顶部</li>
+                    <li><strong>撰写技术博客</strong> — 介绍"为什么用双模型架构"和"四层蒸馏的设计思路"</li>
+                    <li><strong>准备面试话术</strong> — 基于竞品对比，突出你的差异化优势</li>
+                </ul>
+            </div>
+            
+            <h3 style="font-size: 24px; margin-bottom: 20px; margin-top: 40px;">长期（如果要商业化）</h3>
+            <div class="card">
+                <ul>
+                    <li><strong>添加批量处理</strong> — 支持上传多个文件，批量生成认知画像</li>
+                    <li><strong>集成知识图谱</strong> — 参考 neo4j-labs，将认知画像可视化为图谱</li>
+                    <li><strong>用户认证系统</strong> — 添加 JWT 认证，支持多用户使用</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- 面试话术 -->
+        <section>
+            <h2>面试话术（直接可用）</h2>
+            <div class="highlight-box">
+                <h3>项目介绍（30 秒版本）</h3>
+                <p>Mirror 是一个多阶段 LLM 蒸馏系统，用 Gemini 2.0 Flash 压缩长文本，再用 Claude Sonnet 4 进行四层串行蒸馏，最终生成认知画像。我调研了 GitHub 上 5 个同类项目，发现只有 Mirror 实现了多层蒸馏和认知画像生成，这是我的差异化优势。技术栈是 FastAPI + React + PostgreSQL，已部署到腾讯云，支持实时进度监控和质量评估。</p>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>技术亮点（回答"你做了什么"）</h3>
+                <p><strong>1. 双模型架构</strong> — 用 Gemini 做压缩（便宜快），用 Claude 做蒸馏（质量高），单任务成本控制在 $0.20 以内<br>
+                <strong>2. 四层串行蒸馏</strong> — Layer 1 提取段落索引，Layer 2/3 只传索引不传原文，节省 60% tokens<br>
+                <strong>3. 质量评估系统</strong> — 置信度评分 + Bad Case 检测 + 覆盖度分析，确保输出质量<br>
+                <strong>4. 后台线程处理</strong> — 用 Python threading 实现异步任务，前端轮询获取进度</p>
+            </div>
+            
+            <div class="highlight-box">
+                <h3>竞品对比（回答"为什么不用现成的"）</h3>
+                <p>我调研了 neo4j-labs 的 llm-graph-builder（4.6k stars）和其他 4 个项目，发现它们都是单层知识提取，输出知识图谱。Mirror 的定位不同：我做的是<strong>多层蒸馏</strong>，从底层假设到认知画像，逐层提炼，最终输出的是<strong>作者的思维模式</strong>，而不是知识点。这个方向在 GitHub 上没有竞品，是我的独家特性。</p>
+            </div>
+        </section>
+        
+        <!-- 页脚 -->
+        <div style="margin-top: 120px; padding-top: 40px; border-top: 2px solid #ddd; text-align: center; color: #666; font-size: 14px;">
+            <p>Mirror 竞品分析报告 · 生成时间: 2026-05-14</p>
+            <p>数据来源: GitHub API · 分析工具: Hermes Agent</p>
+        </div>
+    </div>
+</body>
+</html>

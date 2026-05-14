@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import UploadPage from './pages/UploadPage';
 import ProgressPage from './pages/ProgressPage';
 import ResultPage from './pages/ResultPage';
+// Build: 2026-05-13-23:11
 
 function App() {
   return (
@@ -43,3 +44,4 @@ function App() {
 }
 
 export default App;
+// Force rebuild Wed May 13 11:11:54 PM CST 2026

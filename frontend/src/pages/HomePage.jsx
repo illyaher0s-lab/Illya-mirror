@@ -6,6 +6,7 @@ import AppHeader from '../components/AppHeader';
 import PageContainer from '../components/PageContainer';
 import PageTitle from '../components/PageTitle';
 import PrimaryButton from '../components/PrimaryButton';
+import SecondaryButton from '../components/SecondaryButton';
 import FilterTabs from '../components/FilterTabs';
 import TaskCard from '../components/TaskCard';
 import EmptyState from '../components/EmptyState';
@@ -76,7 +77,7 @@ export default function HomePage() {
       <AppHeader />
 
       {/* Hero 区 */}
-      <div className="bg-kenya-cream py-16">
+      <div className="bg-kenya-cream pb-12">
         <PageContainer>
           <PageTitle
             title="镜像"
@@ -90,12 +91,13 @@ export default function HomePage() {
 
       {/* 任务列表区 */}
       <PageContainer>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl leading-8 font-semibold text-kenya-dark">任务列表</h2>
-          <PrimaryButton onClick={() => navigate('/upload')}>
-            创建新任务
-          </PrimaryButton>
-        </div>
+        <div className="bg-white border border-kenya-line rounded-lg p-6 shadow-sm mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl leading-8 font-semibold text-kenya-dark">任务列表</h2>
+            <SecondaryButton onClick={() => navigate('/upload')}>
+              创建新任务
+            </SecondaryButton>
+          </div>
 
         <FilterTabs
           tabs={filterTabs}
@@ -103,7 +105,7 @@ export default function HomePage() {
           onChange={setFilter}
         />
 
-        <div className="space-y-4 mt-6">
+        <div className="space-y-3 mt-6">
           {filteredTasks.map(task => (
             <TaskCard
               key={task.id}
@@ -113,17 +115,18 @@ export default function HomePage() {
           ))}
         </div>
 
-        {filteredTasks.length === 0 && (
-          <EmptyState
-            icon="📋"
-            message={filter === 'all' ? '暂无任务' : `暂无${filterTabs.find(t => t.value === filter)?.label}任务`}
-            actions={[
-              <PrimaryButton key="create" onClick={() => navigate('/upload')}>
-                创建新任务
-              </PrimaryButton>
-            ]}
-          />
-        )}
+          {filteredTasks.length === 0 && (
+            <EmptyState
+              icon="📋"
+              message={filter === 'all' ? '暂无任务' : `暂无${filterTabs.find(t => t.value === filter)?.label}任务`}
+              actions={[
+                <SecondaryButton key="create" onClick={() => navigate('/upload')}>
+                  创建新任务
+                </SecondaryButton>
+              ]}
+            />
+          )}
+        </div>
       </PageContainer>
     </div>
   );

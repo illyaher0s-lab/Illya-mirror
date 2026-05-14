@@ -7,6 +7,15 @@
     margin: 0;
     padding: 0;
   }
+
+  /* 全局输入框 focus 状态 */
+  input:focus,
+  textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.15);
+    border-color: rgba(26, 26, 26, 0.4);
+    transition: box-shadow 120ms, border-color 120ms;
+  }
 }
 
 @layer components {

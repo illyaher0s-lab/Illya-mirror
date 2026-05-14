@@ -103,18 +103,11 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-kenya-brown">
-      <AppHeader />
+      <AppHeader breadcrumb="创建蒸馏任务" />
 
       {/* Hero 区 */}
-      <div className="bg-kenya-cream py-12">
+      <div className="bg-kenya-cream py-10">
         <PageContainer>
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-kenya-dark/60 hover:text-kenya-dark transition-colors mb-4 text-sm"
-          >
-            <span>←</span>
-            <span>返回首页</span>
-          </button>
           <PageTitle
             title="创建蒸馏任务"
             subtitle="上传你的文本内容，我们将提取其中的思维模式"
@@ -124,6 +117,7 @@ export default function UploadPage() {
 
       {/* 表单区 */}
       <PageContainer>
+        <div className="mt-8">
         <FormCard>
           <form onSubmit={handleSubmit}>
             {/* 任务标题 */}
@@ -140,7 +134,7 @@ export default function UploadPage() {
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 maxLength={100}
               />
-              <p className="text-sm text-kenya-dark/50 mt-1">
+              <p className="text-xs text-kenya-dark/40 text-right mt-1">
                 {formData.title.length}/100
               </p>
             </div>
@@ -156,7 +150,7 @@ export default function UploadPage() {
                     {wordCount.toLocaleString()} / 50,000 字
                     {wordCount > 0 && isValidLength && <span className="ml-2">✓</span>}
                   </span>
-                  <label className={`px-4 py-2 text-sm border border-kenya-line rounded-lg
+                  <label className={`px-4 py-2 text-sm border-[0.5px] border-kenya-line rounded-lg
                                    hover:bg-kenya-dark/5 transition-colors font-medium
                                    ${fileLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                     {fileLoading ? '读取文件中...' : '上传文件'}
@@ -205,6 +199,7 @@ export default function UploadPage() {
             </div>
           </form>
         </FormCard>
+        </div>
       </PageContainer>
     </div>
   );
