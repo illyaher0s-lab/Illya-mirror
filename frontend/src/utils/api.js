@@ -87,6 +87,12 @@ export const api = {
       method: 'DELETE',
     }),
 
+  // 停止任务
+  stopTask: (id) => 
+    apiRequest(`/api/distillations/${id}/stop`, {
+      method: 'POST',
+    }),
+
   // 导出任务结果
   exportTask: async (id, format) => {
     const url = `${API_BASE_URL}/api/distillations/${id}/export?format=${format}`;

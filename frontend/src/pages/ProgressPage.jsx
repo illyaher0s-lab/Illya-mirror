@@ -2,13 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
-import AppHeader from '../components/AppHeader';
-import PageContainer from '../components/PageContainer';
-import PageTitle from '../components/PageTitle';
-import ResultCard from '../components/ResultCard';
-import LoadingState from '../components/LoadingState';
-import ErrorState from '../components/ErrorState';
-import SecondaryButton from '../components/SecondaryButton';
 
 export default function ProgressPage() {
   const { id } = useParams();
@@ -19,8 +12,28 @@ export default function ProgressPage() {
   const [polling, setPolling] = useState(true);
   const [pollingStartTime] = useState(Date.now());
   const [isTimeout, setIsTimeout] = useState(false);
+  const [stopping, setStopping] = useState(false);
 
   const POLLING_TIMEOUT = 10 * 60 * 1000; // 10 分钟
+
+  const handleStop = async () => {
+    if (!window.confirm('确定要停止这个任务吗？')) return;
+
+    setStopping(true);
+    try {
+      await api.stopTask(id);
+      toast.success('任务已停止');
+      setPolling(false);
+      // 刷新任务状态
+      const data = await api.getTask(id);
+      setTaskData(data);
+    } catch (err) {
+      console.error('Failed to stop task:', err);
+      toast.error('停止失败');
+    } finally {
+      setStopping(false);
+    }
+  };
 
   useEffect(() => {
     const fetchTaskStatus = async () => {
@@ -66,180 +79,255 @@ export default function ProgressPage() {
     };
   }, [id, polling, pollingStartTime, navigate]);
 
-  const getCurrentStep = () => {
+  const getProgress = () => {
     if (!taskData) return 0;
     
-    const currentLayer = taskData.current_layer;
+    if (taskData.status === 'completed') return 100;
+    if (taskData.status === 'failed' || taskData.status === 'stopped') return 0;
     
-    if (currentLayer === 'compressing') return 1;
-    if (currentLayer === 'layer1_running' || currentLayer === 'layer1_done') return 2;
-    if (currentLayer === 'layer2_running' || currentLayer === 'layer2_done') return 2;
-    if (currentLayer === 'layer3_running' || currentLayer === 'layer3_done') return 3;
-    if (currentLayer === 'layer4_running' || currentLayer === 'layer4_done') return 3;
-    if (currentLayer === 'generating_report' || taskData.status === 'completed') return 4;
-    
-    return 1;
+    const currentLayer = taskData.current_layer || 0;
+    return (currentLayer / 4) * 100;
   };
 
-  const steps = [
-    '上传完成',
-    '分析中',
-    '压缩中',
-    '完成'
-  ];
-
-  const currentStep = getCurrentStep();
+  const getStatusText = () => {
+    if (!taskData) return 'LOADING...';
+    
+    if (taskData.status === 'completed') return 'COMPLETE';
+    if (taskData.status === 'failed') return 'FAILED';
+    if (taskData.status === 'stopped') return 'STOPPED';
+    
+    const layer = taskData.current_layer || 0;
+    return `PROCESSING LAYER ${layer}/4`;
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-kenya-brown">
-        <AppHeader />
-        <PageContainer>
-          <LoadingState message="加载任务信息..." />
-        </PageContainer>
+      <div className="page-frame paper">
+        <nav className="nav">
+          <div className="nav-breadcrumb">
+            <span className="nav-breadcrumb-link" onClick={() => navigate('/')}>
+              ← MIRROR
+            </span>
+          </div>
+        </nav>
+        <div className="loading-state">
+          <div className="loading-state-icon">∞</div>
+          <div className="loading-state-text">LOADING TASK...</div>
+        </div>
       </div>
     );
   }
 
   if (!taskData) {
     return (
-      <div className="min-h-screen bg-kenya-brown">
-        <AppHeader />
-        <PageContainer>
-          <ErrorState
-            title="任务不存在"
-            message="未找到该任务，可能已被删除"
-            actions={[
-              <SecondaryButton key="home" onClick={() => navigate('/')}>
-                返回首页
-              </SecondaryButton>
-            ]}
-          />
-        </PageContainer>
+      <div className="page-frame paper">
+        <nav className="nav">
+          <div className="nav-breadcrumb">
+            <span className="nav-breadcrumb-link" onClick={() => navigate('/')}>
+              ← MIRROR
+            </span>
+          </div>
+        </nav>
+        <div className="error-state">
+          <div className="error-state-icon">✕</div>
+          <div className="error-state-text">TASK NOT FOUND</div>
+          <button 
+            className="btn-outline" 
+            onClick={() => navigate('/')}
+            style={{ marginTop: '20px' }}
+          >
+            ← BACK TO HOME
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-kenya-brown">
-      <AppHeader breadcrumb={taskData.name} />
+    <div className="page-frame paper">
+      {/* Nav with Breadcrumb */}
+      <nav className="nav">
+        <div className="nav-breadcrumb">
+          <span className="nav-breadcrumb-link" onClick={() => navigate('/')}>
+            ← MIRROR
+          </span>
+          <span className="nav-breadcrumb-sep">/</span>
+          <span className="nav-breadcrumb-cur">{taskData.name}</span>
+        </div>
+        <div className="nav-version">SYS_v2.4</div>
+      </nav>
 
-      {/* Hero 区 */}
-      <div className="bg-kenya-cream py-10">
-        <PageContainer>
-          <PageTitle
-            title={taskData.name}
-            subtitle="蒸馏进行中"
-          />
-        </PageContainer>
-      </div>
+      {/* 内容区 */}
+      <div className="content-area" style={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '60vh'
+      }}>
+        {/* 状态显示 */}
+        <div style={{ textAlign: 'center', maxWidth: '600px' }}>
+          <span className="eyebrow" style={{ display: 'block', marginBottom: '16px' }}>
+            DISTILLATION IN PROGRESS
+          </span>
+          
+          <h1 style={{ 
+            fontFamily: 'var(--font-sans)',
+            fontSize: '36px',
+            fontWeight: 700,
+            marginBottom: '24px',
+            color: 'var(--text-primary)'
+          }}>
+            {taskData.name}
+          </h1>
 
-      {/* 进度区 */}
-      <PageContainer>
-        <ResultCard>
-          {/* 步骤进度条 */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              {steps.map((step, idx) => (
-                <div key={idx} className="flex items-center flex-1">
-                  <div className="flex flex-col items-center flex-1">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-semibold transition-all border-2 ${
-                        currentStep > idx
-                          ? 'bg-kenya-dark text-kenya-cream border-kenya-dark'
-                          : currentStep === idx
-                          ? 'bg-kenya-dark text-kenya-cream border-kenya-dark animate-pulse'
-                          : 'bg-kenya-line/20 text-kenya-dark/40 border-kenya-line/40'
-                      }`}
-                    >
-                      {idx + 1}
-                    </div>
-                    <span
-                      className={`mt-2 text-sm font-medium ${
-                        currentStep >= idx ? 'text-kenya-dark' : 'text-kenya-dark/40'
-                      }`}
-                    >
-                      {step}
-                    </span>
-                  </div>
-                  {idx < steps.length - 1 && (
-                    <div className="flex-1 h-1 mx-4 -mt-8">
-                      <div
-                        className={`h-full transition-all ${
-                          currentStep > idx ? 'bg-kenya-dark' : 'bg-kenya-line/20'
-                        }`}
-                      />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-            <p className="text-center text-base text-kenya-dark/60">
-              {polling ? `第 ${currentStep} / ${steps.length} 步：${steps[currentStep - 1]}` : '处理完成'}
-            </p>
+          {/* 进度条 */}
+          <div style={{ 
+            width: '100%',
+            height: '4px',
+            background: 'var(--border-light)',
+            marginBottom: '16px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              height: '100%',
+              background: 'var(--accent-blue)',
+              width: `${getProgress()}%`,
+              transition: 'width 300ms ease'
+            }} />
+          </div>
+
+          {/* 状态文字 */}
+          <div style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '12px',
+            letterSpacing: '0.12em',
+            color: 'var(--text-secondary)',
+            marginBottom: '32px'
+          }}>
+            {getStatusText()}
           </div>
 
           {/* 超时提示 */}
           {isTimeout && (
-            <ErrorState
-              title="处理超时"
-              message="任务处理时间超过 10 分钟，请刷新页面查看最新状态或返回首页"
-              actions={[
-                <SecondaryButton key="refresh" onClick={() => window.location.reload()}>
-                  刷新页面
-                </SecondaryButton>,
-                <SecondaryButton key="home" onClick={() => navigate('/')}>
-                  返回首页
-                </SecondaryButton>
-              ]}
-            />
+            <div style={{ 
+              padding: '20px',
+              background: 'rgba(192,57,43,0.1)',
+              border: '1px solid rgba(192,57,43,0.4)',
+              marginBottom: '20px'
+            }}>
+              <div style={{ 
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10px',
+                color: '#7a1a1a',
+                marginBottom: '12px'
+              }}>
+                ⚠ TIMEOUT: 处理时间超过 10 分钟
+              </div>
+              <button 
+                className="btn-outline" 
+                onClick={() => window.location.reload()}
+              >
+                ⟳ REFRESH
+              </button>
+            </div>
           )}
 
           {/* 失败提示 */}
           {taskData.status === 'failed' && (
-            <ErrorState
-              title="任务失败"
-              message={taskData.error_message || '任务处理失败，请重试'}
-              actions={[
-                <SecondaryButton key="retry" onClick={() => navigate('/upload')}>
-                  创建新任务
-                </SecondaryButton>,
-                <SecondaryButton key="home" onClick={() => navigate('/')}>
-                  返回首页
-                </SecondaryButton>
-              ]}
-            />
-          )}
-
-          {/* 停止提示 */}
-          {taskData.status === 'stopped' && (
-            <ErrorState
-              title="任务已停止"
-              message={taskData.error_message || '任务已被手动停止'}
-              actions={[
-                <SecondaryButton key="retry" onClick={() => navigate('/upload')}>
-                  创建新任务
-                </SecondaryButton>,
-                <SecondaryButton key="home" onClick={() => navigate('/')}>
-                  返回首页
-                </SecondaryButton>
-              ]}
-            />
+            <div style={{ 
+              padding: '20px',
+              background: 'rgba(192,57,43,0.1)',
+              border: '1px solid rgba(192,57,43,0.4)',
+              marginBottom: '20px'
+            }}>
+              <div style={{ 
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10px',
+                color: '#7a1a1a',
+                marginBottom: '8px'
+              }}>
+                ✕ FAILED
+              </div>
+              <div style={{ 
+                fontSize: '13px',
+                color: 'var(--text-secondary)',
+                marginBottom: '12px'
+              }}>
+                {taskData.error_message || '任务处理失败'}
+              </div>
+              <button 
+                className="btn-outline" 
+                onClick={() => navigate('/')}
+              >
+                ← BACK TO HOME
+              </button>
+            </div>
           )}
 
           {/* 完成提示 */}
           {taskData.status === 'completed' && (
-            <div className="text-center py-8">
-              <div className="text-6xl mb-4">✅</div>
-              <p className="text-kenya-dark text-lg font-medium mb-2">蒸馏完成！</p>
-              <p className="text-kenya-dark/60 text-sm mb-6">正在跳转到结果页...</p>
-              <SecondaryButton onClick={() => navigate(`/result/${id}`)}>
-                立即查看结果
-              </SecondaryButton>
+            <div style={{ 
+              padding: '20px',
+              background: 'rgba(224,122,48,0.1)',
+              border: '1px solid rgba(224,122,48,0.4)'
+            }}>
+              <div style={{ 
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10px',
+                color: '#7a4a10',
+                marginBottom: '8px'
+              }}>
+                ✓ COMPLETE
+              </div>
+              <div style={{ 
+                fontSize: '13px',
+                color: 'var(--text-secondary)',
+                marginBottom: '12px'
+              }}>
+                正在跳转到结果页...
+              </div>
+              <button 
+                className="btn-primary" 
+                onClick={() => navigate(`/result/${id}`)}
+              >
+                ▶ 查看结果
+              </button>
             </div>
           )}
-        </ResultCard>
-      </PageContainer>
+
+          {/* 处理中动画 */}
+          {polling && taskData.status !== 'completed' && taskData.status !== 'failed' && (
+            <>
+              <div style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '24px',
+                color: 'var(--accent-blue)',
+                animation: 'pulse 2s ease-in-out infinite',
+                marginBottom: '20px'
+              }}>
+                ∞
+              </div>
+              <button 
+                className="btn-outline" 
+                onClick={handleStop}
+                disabled={stopping}
+                style={{ color: '#c0392b', borderColor: '#c0392b' }}
+              >
+                {stopping ? '⟳ STOPPING...' : '✕ STOP TASK'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+      `}</style>
     </div>
   );
 }

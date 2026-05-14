@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>镜像 · UI Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  --bg:        #E8E0D0;
+  --bg-dark:   #1a1a1a;
+  --bg-card:   #EDE6D8;
+  --bg-input:  #E4DBC8;
+  --accent:    #E07A30;
+  --accent-blue: #4682C8;
+  --text-primary: #1a1a1a;
+  --text-secondary: #555;
+  --text-muted: #888;
+  --border:    #1a1a1a;
+  --border-light: #C8BFB0;
+  --font-mono: 'Space Mono', monospace;
+  --font-sans: 'Space Grotesk', sans-serif;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #2c2c2c;
+  padding: 40px 24px;
+  font-family: var(--font-sans);
+}
+
+/* ============================================================
+   PLAYGROUND WRAPPER
+   ============================================================ */
+.pg-outer { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 64px; }
+.pg-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #666;
+  letter-spacing: 0.2em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pg-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #444;
+}
+
+/* ============================================================
+   SHARED: PAPER TEXTURE (SVG noise, GPU-safe)
+   ============================================================ */
+.paper {
+  background-color: var(--bg);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(0,0,0,0.018) 28px,
+      rgba(0,0,0,0.018) 29px
+    );
+}
+
+/* ============================================================
+   PAGE FRAME
+   ============================================================ */
+.page-frame {
+  border: 2px solid var(--border);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 13px 28px;
+  border-bottom: 1.5px solid var(--border);
+  background: var(--bg);
+  position: relative;
+  z-index: 2;
+}
+.nav-logo {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-logo .nav-arrow { color: var(--accent); }
+.nav-breadcrumb-sep {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--border-light);
+  margin: 0 6px;
+}
+.nav-breadcrumb-cur {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.nav-right {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.14em;
+}
+
+/* ============================================================
+   TICKER
+   ============================================================ */
+.ticker {
+  background: var(--bg-dark);
+  color: var(--accent);
+  padding: 6px 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  display: flex;
+  gap: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker-inner {
+  display: flex;
+  gap: 48px;
+  padding: 0 28px;
+  animation: ticker-scroll 18s linear infinite;
+}
+@keyframes ticker-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-star { color: var(--accent); margin: 0 4px; }
+
+/* ============================================================
+   PAGE 1 — HOME
+   ============================================================ */
+
+/* hero */
+.home-hero {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 0;
+  padding: 40px 28px 0;
+  position: relative;
+  z-index: 1;
+}
+.home-hero-left { padding-right: 24px; }
+.home-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: 0.22em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.home-eyebrow::before {
+  content: '▶';
+  font-size: 8px;
+}
+.home-title {
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+}
+.home-title-outline {
+  font-size: 72px;
+  font-weight: 700;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--border);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  margin-bottom: 24px;
+}
+.home-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 360px;
+  margin-bottom: 28px;
+  border-left: 3px solid var(--accent);
+  padding-left: 14px;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 12px 24px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  transition: filter 150ms;
+}
+.btn-primary:hover { filter: brightness(0.9); }
+
+/* scan widget */
+.home-scan-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+.scan-box {
+  width: 100px;
+  height: 100px;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.scan-box::before, .scan-box::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--accent);
+  border-style: solid;
+}
+.scan-box::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+.scan-box::after  { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+.scan-grid {
+  width: 70px;
+  height: 70px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 2px;
+  padding: 4px;
+}
+.scan-dot { background: var(--border); }
+.scan-dot.o { background: transparent; }
+.scan-dot.a { background: var(--accent); }
+.scan-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-align: right;
+  line-height: 1.6;
+}
+
+/* stat strip */
+.home-stat-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-top: 1.5px solid var(--border);
+  margin-top: 32px;
+}
+.stat-item {
+  padding: 14px 20px;
+  border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.stat-num.accent { color: var(--accent); }
+.stat-num.blue   { color: var(--accent-blue); }
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.14em;
+  margin-top: 4px;
+}
+
+/* task list */
+.task-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 28px 0;
+  border-top: 1.5px solid var(--border);
+}
+.task-section-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.14em;
+}
+.btn-new-task {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 7px 14px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: background 150ms;
+}
+.btn-new-task:hover { background: rgba(0,0,0,0.06); }
+
+/* task tabs */
+.task-tabs {
+  display: flex;
+  gap: 0;
+  padding: 12px 28px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.task-tab {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  padding: 6px 16px 8px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 120ms;
+}
+.task-tab.active {
+  color: var(--text-primary);
+  font-weight: 700;
+  border-bottom: 2px solid var(--border);
+}
+.task-tab:hover:not(.active) { color: var(--text-secondary); }
+
+/* task cards */
+.task-list { padding: 16px 28px 28px; display: flex; flex-direction: column; gap: 10px; }
+
+.task-card {
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 120ms;
+}
+.task-card:hover { border-color: var(--border); }
+
+/* left accent stripe */
+.task-card-stripe {
+  width: 4px;
+  flex-shrink: 0;
+  background: var(--border-light);
+}
+.task-card-stripe.done      { background: var(--accent); }
+.task-card-stripe.processing { background: var(--accent-blue); }
+.task-card-stripe.failed    { background: #c0392b; }
+
+/* card number stamp */
+.task-card-num {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--border-light);
+  padding: 14px 10px;
+  align-self: flex-start;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.task-card-body {
+  flex: 1;
+  padding: 14px 12px;
+}
+.task-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+.task-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.task-status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  border: 1px solid;
+}
+.task-status.done {
+  color: #7a4a10;
+  background: rgba(224,122,48,0.1);
+  border-color: rgba(224,122,48,0.4);
+}
+.task-status.processing {
+  color: #1a3f6f;
+  background: rgba(70,130,200,0.1);
+  border-color: rgba(70,130,200,0.4);
+}
+.task-status.failed {
+  color: #7a1a1a;
+  background: rgba(192,57,43,0.1);
+  border-color: rgba(192,57,43,0.4);
+}
+.task-time {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+/* progress line for processing */
+.task-progress {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.task-progress-bar {
+  width: 80px;
+  height: 2px;
+  background: var(--border-light);
+}
+.task-progress-fill {
+  height: 2px;
+  background: var(--accent-blue);
+}
+
+.task-card-action {
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  flex-shrink: 0;
+}
+.btn-task {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+  transition: background 150ms;
+  white-space: nowrap;
+}
+.btn-task:hover { background: rgba(0,0,0,0.06); }
+.btn-task-text {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 120ms;
+}
+.btn-task-text:hover { color: var(--text-primary); }
+
+/* stamp overlay for done cards */
+.task-stamp {
+  position: absolute;
+  right: 80px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-12deg);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(224,122,48,0.18);
+  border: 1.5px solid rgba(224,122,48,0.18);
+  padding: 3px 8px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* ============================================================
+   PAGE 2 — CREATE
+   ============================================================ */
+.create-hero {
+  padding: 40px 28px 28px;
+}
+.create-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.22em;
+  margin-bottom: 12px;
+}
+.create-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.create-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.create-form-wrap {
+  margin: 0 28px 40px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+}
+.create-form-header {
+  background: var(--bg-dark);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.create-form-header-dot {
+  width: 8px; height: 8px;
+  border: 1px solid #444;
+}
+.create-form-header-dot.orange { border-color: var(--accent); background: rgba(224,122,48,0.3); }
+.create-form-header-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: #555;
+  letter-spacing: 0.18em;
+  margin-left: 4px;
+}
+.create-form-body { padding: 24px 24px 28px; }
+
+.form-field { margin-bottom: 24px; }
+.form-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-primary);
+  letter-spacing: 0.14em;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.form-label-count {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+.form-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-top-color: var(--border);
+  border-left-color: var(--border);
+  padding: 11px 14px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 120ms, box-shadow 120ms;
+}
+.form-input::placeholder { color: var(--text-muted); font-size: 13px; }
+.form-input:focus {
+  border-color: var(--border);
+  box-shadow: inset 2px 2px 0 rgba(0,0,0,0.08);
+}
+.form-textarea {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-light);
+  border-top-color: var(--border);
+  border-left-color: var(--border);
+  padding: 14px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  resize: vertical;
+  min-height: 160px;
+  line-height: 1.7;
+  transition: border-color 120ms;
+}
+.form-textarea::placeholder { color: var(--text-muted); }
+.form-textarea:focus { border-color: var(--border); }
+
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.btn-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 6px 12px;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: background 150ms;
+}
+.btn-upload:hover { background: rgba(0,0,0,0.06); }
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light);
+  margin-top: 4px;
+}
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 12px 28px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  transition: filter 150ms;
+}
+.btn-submit:hover { filter: brightness(0.9); }
+
+/* ============================================================
+   PAGE 3 — RESULT
+   ============================================================ */
+.result-hero {
+  padding: 36px 28px 24px;
+}
+.result-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+}
+.result-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.16em;
+}
+
+.result-toolbar {
+  padding: 0 28px 16px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.result-toolbar-left { display: flex; flex-direction: column; gap: 10px; }
+
+/* layer chips */
+.layer-chips { display: flex; gap: 4px; }
+.layer-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: background 120ms, color 120ms;
+}
+.layer-chip.active {
+  background: var(--bg-dark);
+  color: #fff;
+  border-color: var(--bg-dark);
+}
+.layer-chip:hover:not(.active) { background: rgba(0,0,0,0.05); }
+
+/* view segmented */
+.view-seg {
+  display: inline-flex;
+  background: rgba(0,0,0,0.06);
+  padding: 3px;
+  gap: 2px;
+}
+.view-seg-btn {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  transition: background 120ms, color 120ms;
+}
+.view-seg-btn.active {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 700;
+  border: 1px solid var(--border-light);
+}
+
+/* export buttons */
+.export-row { display: flex; gap: 6px; }
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 6px 12px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  transition: border-color 120ms, color 120ms;
+}
+.btn-export:hover { border-color: var(--border); color: var(--text-primary); }
+
+/* result content */
+.result-content { padding: 20px 28px 36px; }
+.result-index-header {
+  margin-bottom: 16px;
+}
+.result-index-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+  margin-bottom: 3px;
+}
+.result-index-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+}
+
+.seg-list { display: flex; flex-direction: column; gap: 8px; }
+.seg-item {
+  display: flex;
+  gap: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+.seg-stripe {
+  width: 3px;
+  flex-shrink: 0;
+}
+.seg-stripe.judge  { background: var(--accent); }
+.seg-stripe.infer  { background: var(--accent-blue); }
+.seg-stripe.narrate { background: #3B6D11; }
+
+.seg-body { padding: 12px 16px; flex: 1; }
+.seg-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  padding: 2px 8px;
+  border: 1px solid;
+  margin-bottom: 6px;
+}
+.seg-badge.judge  { color: #7a4a10; border-color: rgba(224,122,48,0.5); background: rgba(224,122,48,0.08); }
+.seg-badge.infer  { color: #1a3f6f; border-color: rgba(70,130,200,0.5); background: rgba(70,130,200,0.08); }
+.seg-badge.narrate { color: #2a4a10; border-color: rgba(59,109,17,0.5); background: rgba(59,109,17,0.08); }
+.seg-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+.seg-num {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--border-light);
+  padding: 12px 12px 0 0;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+</style>
+</head>
+<body>
+<div class="pg-outer">
+
+  <!-- ============================================================
+       PAGE 1: HOME
+  ============================================================ -->
+  <div>
+    <div class="pg-section-label">01 · 首页 · HOME</div>
+    <div class="page-frame paper">
+
+      <!-- Nav -->
+      <div class="nav">
+        <span class="nav-logo">MIRROR</span>
+        <span class="nav-right">SYS_v2.4</span>
+      </div>
+
+      <!-- Ticker -->
+      <div class="ticker">
+        <div class="ticker-inner">
+          <span>COGNITIVE DISTILLATION SYSTEM</span>
+          <span class="ticker-star">★</span>
+          <span>MIRROR OS · 认知操作系统</span>
+          <span class="ticker-star">★</span>
+          <span>EXTRACT THINKING PATTERNS</span>
+          <span class="ticker-star">★</span>
+          <span>BUILD YOUR SECOND BRAIN</span>
+          <span class="ticker-star">★</span>
+          <span>COGNITIVE DISTILLATION SYSTEM</span>
+          <span class="ticker-star">★</span>
+          <span>MIRROR OS · 认知操作系统</span>
+          <span class="ticker-star">★</span>
+          <span>EXTRACT THINKING PATTERNS</span>
+          <span class="ticker-star">★</span>
+          <span>BUILD YOUR SECOND BRAIN</span>
+          <span class="ticker-star">★</span>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="home-hero">
+        <div class="home-hero-left">
+          <div class="home-eyebrow">COGNITIVE OS · 认知操作系统</div>
+          <div class="home-title">镜像</div>
+          <div class="home-title-outline">MIRROR</div>
+          <div class="home-desc">将你的思考方式蒸馏成<br>可复用的认知操作系统</div>
+          <button class="btn-primary">▶ 开始使用</button>
+        </div>
+        <div class="home-scan-wrap">
+          <div class="scan-box">
+            <div class="scan-grid">
+              <div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div>
+              <div class="scan-dot o"></div><div class="scan-dot a"></div><div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot"></div>
+              <div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot o"></div><div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div>
+              <div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot a"></div><div class="scan-dot o"></div><div class="scan-dot"></div>
+              <div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot o"></div><div class="scan-dot"></div>
+              <div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot"></div><div class="scan-dot o"></div><div class="scan-dot a"></div>
+            </div>
+          </div>
+          <div class="scan-label">SYS.ID // MR-001<br>INIT · 认知核心</div>
+        </div>
+      </div>
+
+      <!-- Stat strip -->
+      <div class="home-stat-strip">
+        <div class="stat-item">
+          <div class="stat-num accent">43</div>
+          <div class="stat-label">PARAGRAPHS</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">4</div>
+          <div class="stat-label">DISTIL LAYERS</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num blue">∞</div>
+          <div class="stat-label">PATTERNS</div>
+        </div>
+      </div>
+
+      <!-- Task section -->
+      <div class="task-section-header">
+        <span class="task-section-title">// TASK_QUEUE</span>
+        <button class="btn-new-task">＋ NEW_TASK</button>
+      </div>
+
+      <div class="task-tabs">
+        <span class="task-tab active">ALL</span>
+        <span class="task-tab">PROCESSING</span>
+        <span class="task-tab">DONE</span>
+        <span class="task-tab">FAILED</span>
+      </div>
+
+      <div class="task-list">
+
+        <!-- Task 1: done -->
+        <div class="task-card">
+          <div class="task-card-stripe done"></div>
+          <div class="task-card-num">#001</div>
+          <div class="task-card-body">
+            <div class="task-card-title">思思</div>
+            <div class="task-card-meta">
+              <span class="task-status done">DONE</span>
+              <span class="task-time">19 HRS AGO</span>
+            </div>
+          </div>
+          <div class="task-stamp">COMPLETE</div>
+          <div class="task-card-action">
+            <button class="btn-task">查看结果 →</button>
+          </div>
+        </div>
+
+        <!-- Task 2: done -->
+        <div class="task-card">
+          <div class="task-card-stripe done"></div>
+          <div class="task-card-num">#002</div>
+          <div class="task-card-body">
+            <div class="task-card-title">毛泽东</div>
+            <div class="task-card-meta">
+              <span class="task-status done">DONE</span>
+              <span class="task-time">19 HRS AGO</span>
+            </div>
+          </div>
+          <div class="task-stamp">COMPLETE</div>
+          <div class="task-card-action">
+            <button class="btn-task">查看结果 →</button>
+          </div>
+        </div>
+
+        <!-- Task 3: processing -->
+        <div class="task-card">
+          <div class="task-card-stripe processing"></div>
+          <div class="task-card-num">#003</div>
+          <div class="task-card-body">
+            <div class="task-card-title">毛泽东 II</div>
+            <div class="task-card-meta">
+              <span class="task-status processing">PROCESSING</span>
+              <span class="task-time">1 DAY AGO</span>
+            </div>
+            <div class="task-progress">
+              <div class="task-progress-bar"><div class="task-progress-fill" style="width:45%"></div></div>
+              <span>LAYER_1 · 45%</span>
+            </div>
+          </div>
+          <div class="task-card-action">
+            <button class="btn-task-text">查看进度 →</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE 2: CREATE
+  ============================================================ -->
+  <div>
+    <div class="pg-section-label">02 · 创建任务页 · CREATE</div>
+    <div class="page-frame paper">
+
+      <!-- Nav -->
+      <div class="nav">
+        <span class="nav-logo">
+          <span class="nav-arrow">←</span> MIRROR
+          <span class="nav-breadcrumb-sep">/</span>
+          <span class="nav-breadcrumb-cur">创建蒸馏任务</span>
+        </span>
+      </div>
+
+      <!-- Ticker (lighter) -->
+      <div class="ticker" style="animation: none;">
+        <div style="padding: 0 28px; display:flex; gap:48px; font-family:var(--font-mono); font-size:10px; letter-spacing:0.18em;">
+          <span>NEW_DISTILLATION_TASK</span>
+          <span class="ticker-star">★</span>
+          <span>UPLOAD · ANALYZE · EXTRACT</span>
+          <span class="ticker-star">★</span>
+          <span>MIN 1000 CHARS REQUIRED</span>
+        </div>
+      </div>
+
+      <!-- Hero -->
+      <div class="create-hero">
+        <div class="create-eyebrow">// NEW_TASK · 创建蒸馏任务</div>
+        <div class="create-title">创建蒸馏任务</div>
+        <div class="create-desc" style="font-size:13px;color:var(--text-secondary);margin-top:6px">上传你的文本内容，我们将提取其中的思维模式</div>
+      </div>
+
+      <!-- Form -->
+      <div class="create-form-wrap">
+        <div class="create-form-header">
+          <div class="create-form-header-dot orange"></div>
+          <div class="create-form-header-dot"></div>
+          <div class="create-form-header-dot"></div>
+          <span class="create-form-header-title">TASK_INPUT · 任务输入</span>
+        </div>
+        <div class="create-form-body">
+          <div class="form-field">
+            <div class="form-label">
+              <span>TASK_TITLE · 任务标题</span>
+              <span class="form-label-count">0 / 100</span>
+            </div>
+            <input class="form-input" type="text" placeholder="给这次蒸馏起个名字">
+          </div>
+          <div class="form-field" style="margin-bottom:20px">
+            <div class="form-label-row">
+              <span class="form-label" style="margin:0">TEXT_INPUT · 文本内容</span>
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:0.1em">0 / 50,000</span>
+                <button class="btn-upload">↑ 上传文件</button>
+              </div>
+            </div>
+            <textarea class="form-textarea" placeholder="粘贴或输入至少 1000 字的文本内容..."></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn-submit">▶ 开始蒸馏</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PAGE 3: RESULT
+  ============================================================ -->
+  <div>
+    <div class="pg-section-label">03 · 结果页 · RESULT</div>
+    <div class="page-frame paper">
+
+      <!-- Nav -->
+      <div class="nav">
+        <span class="nav-logo">
+          <span class="nav-arrow">←</span> MIRROR
+          <span class="nav-breadcrumb-sep">/</span>
+          <span class="nav-breadcrumb-cur">思思</span>
+        </span>
+      </div>
+
+      <!-- Hero -->
+      <div class="result-hero">
+        <div class="result-title">思思</div>
+        <div class="result-sub">DISTILLATION_RESULT · 蒸馏结果</div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="result-toolbar">
+        <div class="result-toolbar-left">
+          <div class="layer-chips">
+            <button class="layer-chip active">L1</button>
+            <button class="layer-chip">L2</button>
+            <button class="layer-chip">L3</button>
+            <button class="layer-chip">L4</button>
+          </div>
+          <div class="view-seg">
+            <button class="view-seg-btn active">蒸馏内容</button>
+            <button class="view-seg-btn">质量报告</button>
+          </div>
+        </div>
+        <div class="export-row">
+          <button class="btn-export">↓ JSON</button>
+          <button class="btn-export">↓ MD</button>
+          <button class="btn-export">↓ TXT</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="result-content">
+        <div class="result-index-header">
+          <div class="result-index-title">段落索引</div>
+          <div class="result-index-sub">IDENTIFIED 43 SEGMENTS · CLASSIFIED BY TYPE</div>
+        </div>
+        <div class="seg-list">
+
+          <div class="seg-item">
+            <div class="seg-stripe judge"></div>
+            <div class="seg-num">#01</div>
+            <div class="seg-body">
+              <span class="seg-badge judge">JUDGE · 判断型</span>
+              <div class="seg-text">来访者自认为的问题往往是表象，真实问题藏在选择背后的认知模式、资源结构和行动能力中</div>
+            </div>
+          </div>
+
+          <div class="seg-item">
+            <div class="seg-stripe infer"></div>
+            <div class="seg-num">#02</div>
+            <div class="seg-body">
+              <span class="seg-badge infer">INFER · 推理型</span>
+              <div class="seg-text">通过数据、表达方式、归因逻辑、情绪反应识别问题本质</div>
+            </div>
+          </div>
+
+          <div class="seg-item">
+            <div class="seg-stripe judge"></div>
+            <div class="seg-num">#03</div>
+            <div class="seg-body">
+              <span class="seg-badge judge">JUDGE · 判断型</span>
+              <div class="seg-text">排除常见错误解释，重构问题定义</div>
+            </div>
+          </div>
+
+          <div class="seg-item">
+            <div class="seg-stripe narrate"></div>
+            <div class="seg-num">#04</div>
+            <div class="seg-body">
+              <span class="seg-badge narrate">NARRATE · 叙述型</span>
+              <div class="seg-text">建立从症状到根因的完整因果链，避免在表层问题上反复循环</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
