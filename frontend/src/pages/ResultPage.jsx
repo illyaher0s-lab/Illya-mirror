@@ -200,33 +200,51 @@ export default function ResultPage() {
         </div>
 
         {data.signature_phrases && data.signature_phrases.length > 0 && (
-          <div style={{ 
-            background: 'var(--bg-card)', 
-            border: '1px solid var(--border-light)',
-            padding: '20px',
-            marginBottom: '16px'
-          }}>
-            <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '16px' }}>标志性短语</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
+          <div style={{ marginBottom: '16px' }}>
+            <h4 style={{ 
+              fontFamily: 'var(--font-sans)', 
+              fontSize: '16px', 
+              fontWeight: 600, 
+              marginBottom: '12px',
+              color: 'var(--text-primary)'
+            }}>
+              标志性短语
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '8px' }}>
               {data.signature_phrases.map((phrase, idx) => (
                 <div key={idx} style={{ 
-                  padding: '12px',
-                  background: 'var(--bg-input)',
-                  borderLeft: '3px solid var(--border-light)'
+                  position: 'relative',
+                  border: '1px solid var(--border-light)',
+                  background: 'var(--bg-card)',
+                  padding: '16px'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span style={{ fontWeight: 600, fontSize: '14px' }}>{phrase.phrase}</span>
-                    <span style={{ 
-                      fontFamily: 'var(--font-mono)', 
-                      fontSize: '10px', 
-                      color: 'var(--text-muted)' 
-                    }}>
-                      ({phrase.frequency}次)
-                    </span>
+                  <div style={{ 
+                    fontFamily: 'var(--font-sans)', 
+                    fontSize: '14px', 
+                    fontWeight: 600,
+                    color: 'var(--text-primary)',
+                    marginBottom: '8px'
+                  }}>
+                    {phrase.phrase}
                   </div>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                  <div style={{ 
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '12px', 
+                    color: 'var(--text-secondary)',
+                    lineHeight: 1.7
+                  }}>
                     {phrase.cognitive_role}
                   </div>
+                  <span style={{ 
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    fontFamily: 'var(--font-mono)', 
+                    fontSize: '9px', 
+                    color: 'var(--text-muted)'
+                  }}>
+                    {phrase.frequency}次
+                  </span>
                 </div>
               ))}
             </div>
@@ -237,34 +255,80 @@ export default function ResultPage() {
           <div key={idx} style={{ 
             background: 'var(--bg-card)', 
             border: '1px solid var(--border-light)',
-            padding: '20px',
-            marginBottom: '16px'
+            padding: '20px 24px',
+            marginBottom: '12px'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
               <span style={{ 
                 fontFamily: 'var(--font-mono)', 
-                fontSize: '10px', 
-                padding: '4px 10px',
+                fontSize: '9px', 
+                padding: '3px 8px',
                 background: 'var(--bg-dark)',
                 color: '#fff',
-                letterSpacing: '0.08em'
+                letterSpacing: '0.1em'
               }}>
                 {strategy.id}
               </span>
-              <h4 style={{ fontSize: '16px', fontWeight: 600 }}>{strategy.name}</h4>
+              <h4 style={{ 
+                fontFamily: 'var(--font-sans)',
+                fontSize: '18px', 
+                fontWeight: 700,
+                color: 'var(--text-primary)'
+              }}>
+                {strategy.name}
+              </h4>
             </div>
 
             {strategy.observable_form && (
-              <div style={{ marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>可观察形式：</span>
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{strategy.observable_form}</span>
+              <div style={{ 
+                borderTop: idx === 0 ? 'none' : '1px solid var(--border-light)',
+                paddingTop: idx === 0 ? 0 : '12px',
+                marginTop: idx === 0 ? 0 : '12px',
+                marginBottom: '12px' 
+              }}>
+                <span style={{ 
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10px', 
+                  fontWeight: 700, 
+                  color: 'var(--text-primary)',
+                  letterSpacing: '0.1em'
+                }}>
+                  可观察形式：
+                </span>
+                <span style={{ 
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px', 
+                  color: 'var(--text-secondary)',
+                  marginLeft: '8px'
+                }}>
+                  {strategy.observable_form}
+                </span>
               </div>
             )}
 
             {strategy.cognitive_function && (
-              <div style={{ marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>认知功能：</span>
-                <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{strategy.cognitive_function}</span>
+              <div style={{ 
+                borderTop: '1px solid var(--border-light)',
+                paddingTop: '12px',
+                marginTop: '12px'
+              }}>
+                <span style={{ 
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '10px', 
+                  fontWeight: 700, 
+                  color: 'var(--text-primary)',
+                  letterSpacing: '0.1em'
+                }}>
+                  认知功能：
+                </span>
+                <span style={{ 
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px', 
+                  color: 'var(--text-secondary)',
+                  marginLeft: '8px'
+                }}>
+                  {strategy.cognitive_function}
+                </span>
               </div>
             )}
           </div>
@@ -289,21 +353,123 @@ export default function ResultPage() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {data.identity && (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px' }}>
-              <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>身份信息</h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ 
+              background: 'var(--bg-card)', 
+              border: '1px solid var(--border-light)', 
+              padding: '20px 24px'
+            }}>
+              <h4 style={{ 
+                fontFamily: 'var(--font-sans)',
+                fontSize: '16px', 
+                fontWeight: 700, 
+                color: 'var(--text-primary)',
+                marginBottom: '16px' 
+              }}>
+                身份信息
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {data.identity.subject && (
                   <div>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>模拟对象：</span>
-                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{data.identity.subject}</span>
+                    <span style={{ 
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px', 
+                      fontWeight: 700, 
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.1em'
+                    }}>
+                      模拟对象：
+                    </span>
+                    <span style={{ 
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px', 
+                      color: 'var(--text-secondary)',
+                      marginLeft: '8px'
+                    }}>
+                      {data.identity.subject}
+                    </span>
                   </div>
                 )}
                 {data.identity.simulation_scope && (
                   <div>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>覆盖范围：</span>
-                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{data.identity.simulation_scope}</span>
+                    <span style={{ 
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px', 
+                      fontWeight: 700, 
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.1em'
+                    }}>
+                      覆盖范围：
+                    </span>
+                    <span style={{ 
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px', 
+                      color: 'var(--text-secondary)',
+                      marginLeft: '8px'
+                    }}>
+                      {data.identity.simulation_scope}
+                    </span>
+                  </div>
+                )}
+                {data.identity.known_blind_spots && data.identity.known_blind_spots.length > 0 && (
+                  <div style={{ 
+                    borderTop: '1px solid var(--border-light)',
+                    paddingTop: '12px',
+                    marginTop: '12px'
+                  }}>
+                    <div style={{ 
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px', 
+                      fontWeight: 700, 
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.1em',
+                      marginBottom: '8px'
+                    }}>
+                      已知盲点：
+                    </div>
+                    <ul style={{ 
+                      paddingLeft: '20px',
+                      margin: 0,
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.7
+                    }}>
+                      {data.identity.known_blind_spots.map((spot, i) => (
+                        <li key={i}>{spot}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {data.identity.known_failure_modes && data.identity.known_failure_modes.length > 0 && (
+                  <div style={{ 
+                    borderTop: '1px solid var(--border-light)',
+                    paddingTop: '12px',
+                    marginTop: '12px'
+                  }}>
+                    <div style={{ 
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px', 
+                      fontWeight: 700, 
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.1em',
+                      marginBottom: '8px'
+                    }}>
+                      已知失效模式：
+                    </div>
+                    <ul style={{ 
+                      paddingLeft: '20px',
+                      margin: 0,
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.7
+                    }}>
+                      {data.identity.known_failure_modes.map((mode, i) => (
+                        <li key={i}>{mode}</li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>
@@ -311,24 +477,35 @@ export default function ResultPage() {
           )}
 
           {data.core_assumptions && data.core_assumptions.length > 0 && (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px' }}>
-              <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>
+            <div style={{ 
+              background: 'var(--bg-card)', 
+              border: '1px solid var(--border-light)', 
+              padding: '20px 24px'
+            }}>
+              <h4 style={{ 
+                fontFamily: 'var(--font-sans)',
+                fontSize: '16px', 
+                fontWeight: 700, 
+                color: 'var(--text-primary)',
+                marginBottom: '16px' 
+              }}>
                 核心假设 ({data.core_assumptions.length} 条)
               </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                 {data.core_assumptions.map((assumption, idx) => (
                   <div key={idx} style={{ 
-                    padding: '12px',
-                    background: 'var(--bg-input)',
-                    borderLeft: '3px solid var(--border-light)'
+                    borderTop: idx === 0 ? 'none' : '1px solid var(--border-light)',
+                    paddingTop: idx === 0 ? 0 : '12px',
+                    marginTop: idx === 0 ? 0 : '12px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                       <span style={{ 
                         fontFamily: 'var(--font-mono)', 
                         fontSize: '9px', 
-                        padding: '2px 6px',
+                        padding: '3px 8px',
                         background: 'var(--bg-dark)',
-                        color: '#fff'
+                        color: '#fff',
+                        letterSpacing: '0.1em'
                       }}>
                         {assumption.id}
                       </span>
@@ -340,13 +517,21 @@ export default function ResultPage() {
                           border: '1px solid',
                           color: assumption.confidence === '高' ? '#7a4a10' : '#1a3f6f',
                           background: assumption.confidence === '高' ? 'rgba(224,122,48,0.1)' : 'rgba(70,130,200,0.1)',
-                          borderColor: assumption.confidence === '高' ? 'rgba(224,122,48,0.4)' : 'rgba(70,130,200,0.4)'
+                          borderColor: assumption.confidence === '高' ? 'rgba(224,122,48,0.4)' : 'rgba(70,130,200,0.4)',
+                          letterSpacing: '0.1em'
                         }}>
                           {assumption.confidence}
                         </span>
                       )}
                     </div>
-                    <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{assumption.statement}</p>
+                    <p style={{ 
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px', 
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.7
+                    }}>
+                      {assumption.statement}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -354,34 +539,333 @@ export default function ResultPage() {
           )}
 
           {data.reasoning_engine && (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px' }}>
-              <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>推理引擎</h4>
+            <div style={{ 
+              background: 'var(--bg-card)', 
+              border: '1px solid var(--border-light)', 
+              padding: '20px 24px'
+            }}>
+              <h4 style={{ 
+                fontFamily: 'var(--font-sans)',
+                fontSize: '16px', 
+                fontWeight: 700, 
+                color: 'var(--text-primary)',
+                marginBottom: '16px' 
+              }}>
+                推理引擎
+              </h4>
               {data.reasoning_engine.description && (
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                <p style={{ 
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px', 
+                  color: 'var(--text-secondary)', 
+                  lineHeight: 1.7,
+                  marginBottom: '12px' 
+                }}>
                   {data.reasoning_engine.description}
                 </p>
               )}
               {data.reasoning_engine.patterns && data.reasoning_engine.patterns.length > 0 && (
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  包含 {data.reasoning_engine.patterns.length} 个推理模式
+                <div>
+                  <div style={{ 
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10px', 
+                    color: 'var(--text-muted)',
+                    letterSpacing: '0.05em',
+                    marginBottom: '12px'
+                  }}>
+                    包含 {data.reasoning_engine.patterns.length} 个推理模式
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                    {data.reasoning_engine.patterns.map((pattern, idx) => (
+                      <div key={idx} style={{ 
+                        borderTop: idx === 0 ? 'none' : '1px solid var(--border-light)',
+                        paddingTop: idx === 0 ? 0 : '12px',
+                        marginTop: idx === 0 ? 0 : '12px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <span style={{ 
+                            fontFamily: 'var(--font-mono)', 
+                            fontSize: '9px', 
+                            padding: '3px 8px',
+                            background: 'var(--bg-dark)',
+                            color: '#fff',
+                            letterSpacing: '0.1em'
+                          }}>
+                            {pattern.id}
+                          </span>
+                          <span style={{ 
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: 'var(--text-primary)'
+                          }}>
+                            {pattern.name}
+                          </span>
+                        </div>
+                        {pattern.trigger && (
+                          <div style={{ marginBottom: '8px' }}>
+                            <span style={{ 
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: 'var(--text-primary)',
+                              letterSpacing: '0.1em'
+                            }}>
+                              触发条件：
+                            </span>
+                            <span style={{ 
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13px',
+                              color: 'var(--text-secondary)',
+                              marginLeft: '8px'
+                            }}>
+                              {pattern.trigger}
+                            </span>
+                          </div>
+                        )}
+                        {pattern.steps && pattern.steps.length > 0 && (
+                          <div>
+                            <div style={{ 
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: 'var(--text-primary)',
+                              letterSpacing: '0.1em',
+                              marginBottom: '6px'
+                            }}>
+                              推理步骤：
+                            </div>
+                            <ol style={{ 
+                              paddingLeft: '20px',
+                              margin: 0,
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13px',
+                              color: 'var(--text-secondary)',
+                              lineHeight: 1.7
+                            }}>
+                              {pattern.steps.map((step, i) => (
+                                <li key={i}>{step}</li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           )}
 
           {data.expression_engine && (
-            <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px' }}>
-              <h4 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '12px' }}>表达引擎</h4>
+            <div style={{ 
+              background: 'var(--bg-card)', 
+              border: '1px solid var(--border-light)', 
+              padding: '20px 24px'
+            }}>
+              <h4 style={{ 
+                fontFamily: 'var(--font-sans)',
+                fontSize: '16px', 
+                fontWeight: 700, 
+                color: 'var(--text-primary)',
+                marginBottom: '16px' 
+              }}>
+                表达引擎
+              </h4>
               {data.expression_engine.description && (
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                <p style={{ 
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '13px', 
+                  color: 'var(--text-secondary)', 
+                  lineHeight: 1.7,
+                  marginBottom: '12px' 
+                }}>
                   {data.expression_engine.description}
                 </p>
               )}
               {data.expression_engine.strategies && data.expression_engine.strategies.length > 0 && (
-                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  包含 {data.expression_engine.strategies.length} 个表达策略
+                <div>
+                  <div style={{ 
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10px', 
+                    color: 'var(--text-muted)',
+                    letterSpacing: '0.05em',
+                    marginBottom: '12px'
+                  }}>
+                    包含 {data.expression_engine.strategies.length} 个表达策略
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                    {data.expression_engine.strategies.map((strategy, idx) => (
+                      <div key={idx} style={{ 
+                        borderTop: idx === 0 ? 'none' : '1px solid var(--border-light)',
+                        paddingTop: idx === 0 ? 0 : '12px',
+                        marginTop: idx === 0 ? 0 : '12px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                          <span style={{ 
+                            fontFamily: 'var(--font-mono)', 
+                            fontSize: '9px', 
+                            padding: '3px 8px',
+                            background: 'var(--bg-dark)',
+                            color: '#fff',
+                            letterSpacing: '0.1em'
+                          }}>
+                            {strategy.id}
+                          </span>
+                          <span style={{ 
+                            fontFamily: 'var(--font-sans)',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: 'var(--text-primary)'
+                          }}>
+                            {strategy.name}
+                          </span>
+                        </div>
+                        {strategy.how && (
+                          <div style={{ marginBottom: '8px' }}>
+                            <span style={{ 
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: 'var(--text-primary)',
+                              letterSpacing: '0.1em'
+                            }}>
+                              如何使用：
+                            </span>
+                            <span style={{ 
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13px',
+                              color: 'var(--text-secondary)',
+                              marginLeft: '8px'
+                            }}>
+                              {strategy.how}
+                            </span>
+                          </div>
+                        )}
+                        {strategy.when_to_use && (
+                          <div>
+                            <span style={{ 
+                              fontFamily: 'var(--font-mono)',
+                              fontSize: '10px',
+                              fontWeight: 700,
+                              color: 'var(--text-primary)',
+                              letterSpacing: '0.1em'
+                            }}>
+                              使用时机：
+                            </span>
+                            <span style={{ 
+                              fontFamily: 'var(--font-sans)',
+                              fontSize: '13px',
+                              color: 'var(--text-secondary)',
+                              marginLeft: '8px'
+                            }}>
+                              {strategy.when_to_use}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {data.usage_instructions && (
+            <div style={{ 
+              background: 'var(--bg-card)', 
+              border: '1px solid var(--border-light)', 
+              padding: '20px 24px'
+            }}>
+              <h4 style={{ 
+                fontFamily: 'var(--font-sans)',
+                fontSize: '16px', 
+                fontWeight: 700, 
+                color: 'var(--text-primary)',
+                marginBottom: '16px' 
+              }}>
+                使用说明
+              </h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {data.usage_instructions.for_new_question && (
+                  <div>
+                    <div style={{ 
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.1em',
+                      marginBottom: '6px'
+                    }}>
+                      处理新问题：
+                    </div>
+                    <pre style={{ 
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.7,
+                      margin: 0,
+                      whiteSpace: 'pre-wrap'
+                    }}>
+                      {data.usage_instructions.for_new_question}
+                    </pre>
+                  </div>
+                )}
+                {data.usage_instructions.for_opinion_judgment && (
+                  <div style={{ 
+                    borderTop: '1px solid var(--border-light)',
+                    paddingTop: '12px'
+                  }}>
+                    <div style={{ 
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.1em',
+                      marginBottom: '6px'
+                    }}>
+                      判断观点：
+                    </div>
+                    <pre style={{ 
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.7,
+                      margin: 0,
+                      whiteSpace: 'pre-wrap'
+                    }}>
+                      {data.usage_instructions.for_opinion_judgment}
+                    </pre>
+                  </div>
+                )}
+                {data.usage_instructions.for_expression_task && (
+                  <div style={{ 
+                    borderTop: '1px solid var(--border-light)',
+                    paddingTop: '12px'
+                  }}>
+                    <div style={{ 
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: 'var(--text-primary)',
+                      letterSpacing: '0.1em',
+                      marginBottom: '6px'
+                    }}>
+                      生成表达：
+                    </div>
+                    <pre style={{ 
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.7,
+                      margin: 0,
+                      whiteSpace: 'pre-wrap'
+                    }}>
+                      {data.usage_instructions.for_expression_task}
+                    </pre>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

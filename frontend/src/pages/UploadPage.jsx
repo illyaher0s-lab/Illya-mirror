@@ -13,7 +13,7 @@ export default function UploadPage() {
   const [fileLoading, setFileLoading] = useState(false);
 
   const wordCount = formData.content.length;
-  const isValidLength = wordCount >= 1000 && wordCount <= 50000;
+  const isValidLength = wordCount >= 1000 && wordCount <= 150000;
   const isValid = formData.title.trim() && formData.content.trim() && isValidLength;
 
   const handleFileUpload = (e) => {
@@ -59,8 +59,8 @@ export default function UploadPage() {
       return;
     }
 
-    if (wordCount > 50000) {
-      toast.error('文本内容不能超过 50000 字');
+    if (wordCount > 150000) {
+      toast.error('文本内容不能超过 150000 字');
       return;
     }
 
@@ -83,7 +83,7 @@ export default function UploadPage() {
   const getWordCountColor = () => {
     if (wordCount === 0) return 'var(--text-muted)';
     if (wordCount < 1000) return '#c0392b';
-    if (wordCount > 50000) return '#c0392b';
+    if (wordCount > 150000) return '#c0392b';
     if (wordCount > 10000) return '#E07A30';
     return 'var(--accent-blue)';
   };
@@ -213,10 +213,10 @@ export default function UploadPage() {
                       ⚠ 至少需要 1000 字（当前 {wordCount} 字）
                     </span>
                   )}
-                  {wordCount > 50000 && (
-                    <span style={{ color: '#c0392b' }}>
-                      ⚠ 不能超过 50000 字（当前 {wordCount} 字）
-                    </span>
+                  {wordCount > 150000 && (
+                    <div className="form-hint" style={{ color: '#c0392b', marginTop: '8px' }}>
+                      ⚠ 不能超过 150000 字（当前 {wordCount} 字）
+                    </div>
                   )}
                 </div>
               </div>

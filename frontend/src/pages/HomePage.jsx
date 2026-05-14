@@ -38,6 +38,32 @@ export default function HomePage() {
     }
   };
 
+  // 计算相对时间
+  const getRelativeTime = (timestamp) => {
+    const now = new Date();
+    const created = new Date(timestamp);
+    const diffMs = now - created;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return `${diffHours} HRS AGO`;
+    } else {
+      return `${diffDays} DAYS AGO`;
+    }
+  };
+
+  // 获取当前层级文本
+  const getLayerText = (layer) => {
+    const layerNames = {
+      1: 'LAYER_1',
+      2: 'LAYER_2',
+      3: 'LAYER_3',
+      4: 'LAYER_4'
+    };
+    return layerNames[layer] || 'PENDING';
+  };
+
   const filterTabs = [
     { value: 'all', label: 'ALL' },
     { value: 'processing', label: 'PROCESSING' },
@@ -105,7 +131,8 @@ export default function HomePage() {
       <div style={{ 
         borderTop: `2px solid var(--border)`, 
         padding: '28px',
-        flex: 1 
+        flex: 1,
+        border: '2px solid var(--border)'
       }}>
         <div style={{ 
           display: 'flex', 
@@ -114,14 +141,19 @@ export default function HomePage() {
           marginBottom: '20px'
         }}>
           <h2 style={{ 
-            fontFamily: 'var(--font-sans)', 
-            fontSize: '24px', 
-            fontWeight: 600,
+            fontFamily: 'var(--font-mono)', 
+            fontSize: '13px', 
+            fontWeight: 700,
+            letterSpacing: '0.14em',
             color: 'var(--text-primary)'
           }}>
-            任务列表
+            // TASK_QUEUE
           </h2>
-          <button className="btn-outline" onClick={() => navigate('/upload')}>
+          <button 
+            className="btn-outline" 
+            onClick={() => navigate('/upload')}
+            style={{ border: '1.5px solid var(--border)' }}
+          >
             ＋ NEW_TASK
           </button>
         </div>
@@ -196,23 +228,24 @@ export default function HomePage() {
                        'FAILED'}
                     </span>
                     <span className="task-card-time">
-                      {new Date(task.created_at).toLocaleDateString('zh-CN', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
-                      }).replace(/\//g, '.')}
+                      {getRelativeTime(task.created_at)}
                     </span>
                   </div>
                   
                   {/* 处理中任务显示进度条 */}
                   {(task.status === 'processing' || task.status === 'pending') && (
                     <div className="task-progress-bar">
-                      <div 
-                        className="task-progress-fill" 
-                        style={{ 
-                          width: `${task.current_layer ? (task.current_layer / 4) * 100 : 0}%` 
-                        }}
-                      />
+                      <div className="task-progress-fill-container">
+                        <div 
+                          className="task-progress-fill" 
+                          style={{ 
+                            width: `${task.current_layer ? (task.current_layer / 4) * 100 : 0}%` 
+                          }}
+                        />
+                      </div>
+                      <span className="task-progress-text">
+                        {getLayerText(task.current_layer)} · {task.current_layer ? Math.round((task.current_layer / 4) * 100) : 0}%
+                      </span>
                     </div>
                   )}
                 </div>
@@ -223,29 +256,51 @@ export default function HomePage() {
                 )}
 
                 {/* 操作按钮 */}
-                <div className="task-card-actions">
+                <div className="task-card-actions" style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                   {task.status === 'completed' ? (
-                    <button className="btn-text" onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/result/${task.id}`);
-                    }}>
-                      查看结果 →
-                    </button>
+                    <>
+                      <button className="btn-text" onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/result/${task.id}`);
+                      }}>
+                        查看结果 →
+                      </button>
+                      <button 
+                        className="task-card-delete" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(task.id);
+                        }}
+                      >
+                        删除
+                      </button>
+                    </>
                   ) : task.status === 'processing' || task.status === 'pending' ? (
-                    <button className="btn-text" onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/progress/${task.id}`);
-                    }}>
-                      查看进度 →
-                    </button>
+                    <>
+                      <button className="btn-text" onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/progress/${task.id}`);
+                      }}>
+                        查看进度 →
+                      </button>
+                      <button 
+                        className="task-card-delete" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(task.id);
+                        }}
+                      >
+                        删除
+                      </button>
+                    </>
                   ) : (
                     <button 
-                      className="btn-text" 
+                      className="task-card-delete" 
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(task.id);
                       }}
-                      style={{ color: '#c0392b' }}
+                      style={{ opacity: 1, pointerEvents: 'auto' }}
                     >
                       删除
                     </button>

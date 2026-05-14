@@ -6,24 +6,24 @@
 
 ## 项目简介
 
-Mirror 是一个基于多阶段 LLM 蒸馏的知识提取系统，采用 **Gemini 2.0 Flash + Claude Sonnet 4** 两阶段蒸馏架构，将长文本（1000-50000字）压缩为易于理解和吸收的结构化内容。
+Mirror 是一个基于多阶段 LLM 蒸馏的知识提取系统，采用 **Gemini 2.0 Flash + Claude Sonnet 4** 两阶段蒸馏架构，将长文本（1000-150000字）压缩为易于理解和吸收的结构化内容。
 
 ### 核心特性
 
 - **四层串行蒸馏**：段落索引 → 推理模式 → 表达策略 → 认知画像
+- **长文本支持**：支持 1,000-150,000 字的文本蒸馏（可处理书籍级别内容）
 - **分段交付**：每层完成后可查看结果、继续或停止
 - **质量评估**：置信度评分、Bad Case 检测、覆盖度分析
 - **导出功能**：支持 JSON/YAML/Markdown 格式导出认知画像
-- **实时监控**：实时进度更新
-- **Kenya Hara 设计**：东方极简美学的用户界面
+- **实时监控**：实时进度更新和任务管理
+- **Retro Sci-Fi UI**：纸质感 + 等宽字体 + 橙蓝配色的复古科幻风格界面
 
 ## 技术栈
 
 ### 前端
 - **Vite 6.0** + **React 19**
-- **Tailwind CSS v4** - 样式框架
 - **React Router v6** - 路由管理
-- **Kenya Hara 设计风格** - 东方极简美学
+- **Retro Sci-Fi 设计系统** - 纸质感 + Space Mono/Grotesk 字体 + 橙蓝配色
 
 ### 后端
 - **FastAPI** - Python Web 框架
@@ -44,9 +44,9 @@ Mirror 是一个基于多阶段 LLM 蒸馏的知识提取系统，采用 **Gemin
 mirror/
 ├── frontend/               # 前端项目
 │   ├── src/
-│   │   ├── pages/         # 页面组件
-│   │   ├── api/           # API 客户端
-│   │   └── index.css      # 全局样式
+│   │   ├── pages/         # 页面组件（HomePage/UploadPage/ProgressPage/ResultPage）
+│   │   ├── utils/         # API 客户端和工具函数
+│   │   └── index.css      # 全局样式（Retro Sci-Fi 设计系统）
 │   ├── dist/              # 生产构建输出
 │   └── package.json
 ├── backend/               # 后端项目
@@ -54,16 +54,29 @@ mirror/
 │   │   ├── main.py        # FastAPI 入口
 │   │   ├── models.py      # 数据库模型
 │   │   ├── schemas.py     # Pydantic 模型
-│   │   ├── routers/       # API 路由
-│   │   └── services/      # 业务逻辑
+│   │   ├── api/           # API 路由
+│   │   └── services/      # 业务逻辑（蒸馏引擎、质量评估）
 │   ├── alembic/           # 数据库迁移
 │   ├── prompts/           # LLM Prompt 模板
 │   ├── venv/              # Python 虚拟环境
 │   └── requirements.txt
 ├── docs/                  # 项目文档
+│   ├── ui.md              # UI 设计文档
+│   ├── three-layer-staged-distillation.md  # 蒸馏架构说明
+│   └── layer4-implementation-report.md     # Layer 4 实现报告
+├── UI/                    # UI 设计规范
+│   ├── mirror_design_spec.md           # 设计规范文档
+│   └── mirror_full_playground.html     # 视觉参考
+├── archive/               # 历史文档归档
+│   ├── ui-redesign/       # UI 改造过程文档
+│   └── planning/          # 项目规划和竞品分析
+├── AGENTS.md              # Agent 工作规范
+├── ARCHITECTURE.md        # 系统架构文档
+├── DEPLOYMENT.md          # 部署文档
+├── ERROR_HANDLING.md      # 错误处理规范
+├── debug.md               # 调试记录
 ├── nginx.conf             # Nginx 配置
 ├── mirror-backend.service # systemd 服务配置
-├── DEPLOYMENT.md          # 部署文档
 └── README.md
 ```
 
@@ -206,22 +219,23 @@ sudo journalctl -u mirror-backend -f
 - [x] 项目初始化和数据库设计
 - [x] 四层蒸馏引擎实现
 - [x] 质量评估模块
-- [x] 前端完整实现（4个页面）
+- [x] 前端完整实现（4个页面：首页/创建/进度/结果）
+- [x] Retro Sci-Fi UI 设计系统（2026-05-14）
 - [x] API 集成
 - [x] 导出功能（JSON/YAML/Markdown）
 - [x] 生产环境部署
 - [x] Nginx 配置
 - [x] systemd 服务配置
 - [x] Layer 4 数据库迁移和架构升级（2026-05-13）
+- [x] 长文本支持（150,000 字上限）（2026-05-14）
 
 ### ⏳ 待优化
 
 - [ ] Gemini API 集成（当前压缩服务缺失）
-- [ ] 真实案例测试
+- [ ] 真实案例测试（书籍级别长文本）
 - [ ] Prompt 优化
 - [ ] 性能测试和优化
 - [ ] 用户认证和权限管理
-- [ ] 考虑废弃 cognitive_profiles 表（当前保留以向后兼容）
 
 ## 环境变量
 
