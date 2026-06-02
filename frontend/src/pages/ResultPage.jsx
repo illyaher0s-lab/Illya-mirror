@@ -2,6 +2,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+import EvidenceCard from '../components/EvidenceCard';
 
 export default function ResultPage() {
   const { id } = useParams();
@@ -176,6 +177,9 @@ export default function ResultPage() {
                   依赖假设：{pattern.underlying_assumptions.join(', ')}
                 </div>
               )}
+
+              {/* 证据回链 */}
+              <EvidenceCard evidence={pattern.evidence} />
             </div>
           ))}
         </div>
@@ -331,6 +335,9 @@ export default function ResultPage() {
                 </span>
               </div>
             )}
+
+            {/* 证据回链 */}
+            <EvidenceCard evidence={strategy.evidence} />
           </div>
         ))}
       </div>
