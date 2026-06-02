@@ -29,11 +29,13 @@ class QualityEvaluator:
         evidence = item.get("evidence", [])
         evidence_count = len(evidence)
         
-        # 统计来源数量（不同的paragraph_id）
+        # 统计来源数量（兼容 source 和 paragraph_id 两种字段名）
         sources = set()
         for ev in evidence:
-            if "paragraph_id" in ev:
-                sources.add(ev["paragraph_id"])
+            # 优先使用 source，如果没有则尝试 paragraph_id
+            source_id = ev.get("source") or ev.get("paragraph_id")
+            if source_id:
+                sources.add(source_id)
         source_count = len(sources)
         
         if evidence_count >= 5 and source_count >= 3:

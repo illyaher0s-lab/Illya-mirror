@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import EvidenceCard from '../components/EvidenceCard';
+import QualityReportCard from '../components/QualityReportCard';
 
 export default function ResultPage() {
   const { id } = useParams();
@@ -989,6 +990,9 @@ export default function ResultPage() {
       </div>
 
       <div className="content-area">
+        {/* 质量评分报告 - 只在有数据时显示 */}
+        <QualityReportCard qualityReport={taskData.quality_report} />
+
         {renderLayerContent()}
       </div>
     </div>
