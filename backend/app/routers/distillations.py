@@ -1,10 +1,11 @@
 """
 Distillation API endpoints - CRUD operations for distillation tasks.
 """
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import Optional
 from uuid import UUID
+import chardet
 
 from app.database import get_db
 from app.models import Distillation, Content
@@ -16,6 +17,50 @@ from app.schemas import (
 from app.services.distillation_engine import run_distillation
 
 router = APIRouter()
+
+
+@router.post("/upload-file")
+async def upload_file(file: UploadFile = File(...)):
+    """
+    Upload a text file and auto-detect encoding.
+    Returns decoded text content.
+    """
+    try:
+        # Read file content as bytes
+        content_bytes = await file.read()
+        
+        # Detect encoding
+        detected = chardet.detect(content_bytes)
+        encoding = detected['encoding']
+        confidence = detected['confidence']
+        
+        # Fallback to utf-8 if detection confidence is too low
+        if confidence < 0.7:
+            encoding = 'utf-8'
+        
+        # Decode text
+        try:
+            text = content_bytes.decode(encoding)
+        except (UnicodeDecodeError, LookupError):
+            # If detected encoding fails, try common Chinese encodings
+            for fallback_encoding in ['gbk', 'gb2312', 'gb18030', 'utf-8']:
+                try:
+                    text = content_bytes.decode(fallback_encoding)
+                    encoding = fallback_encoding
+                    break
+                except (UnicodeDecodeError, LookupError):
+                    continue
+            else:
+                raise HTTPException(status_code=400, detail="无法识别文件编码")
+        
+        return {
+            "text": text,
+            "encoding": encoding,
+            "confidence": confidence,
+            "filename": file.filename
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"文件处理失败: {str(e)}")
 
 
 @router.post("/distillations", response_model=DistillationResponse, status_code=201)

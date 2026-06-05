@@ -190,12 +190,30 @@ export default function ProgressPage() {
             position: 'relative',
             overflow: 'hidden'
           }}>
-            <div style={{
-              height: '100%',
-              background: 'var(--accent-blue)',
-              width: `${getProgress()}%`,
-              transition: 'width 300ms ease'
-            }} />
+            {taskData.status === 'processing' || taskData.status === 'pending' ? (
+              // 处理中：显示动态loading动画
+              <div style={{
+                height: '100%',
+                width: '100%',
+                position: 'relative'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  height: '100%',
+                  width: '30%',
+                  background: 'linear-gradient(90deg, transparent 0%, var(--accent-blue) 50%, transparent 100%)',
+                  animation: 'progressSlide 1.5s ease-in-out infinite'
+                }} />
+              </div>
+            ) : (
+              // 完成/失败：显示静态进度条
+              <div style={{
+                height: '100%',
+                background: 'var(--accent-blue)',
+                width: `${getProgress()}%`,
+                transition: 'width 300ms ease'
+              }} />
+            )}
           </div>
 
           {/* 状态文字 */}

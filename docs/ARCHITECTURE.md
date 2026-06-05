@@ -33,7 +33,7 @@
 ┌────────────────────────┐    ┌──────────────────────────────────┐
 │   PostgreSQL (5432)    │    │       外部 API                    │
 │  - distillations 表    │    │  - Anthropic Claude API          │
-│  - contents 表         │    │  - Google Gemini API             │
+│  - contents 表         │    │                                  │
 │  - quality_reports 表  │    │                                  │
 └────────────────────────┘    └──────────────────────────────────┘
 ```
@@ -56,9 +56,9 @@
 后台线程启动 (distillation_engine.py)
   ↓
 【阶段 0: 文本压缩】
-Gemini 2.0 Flash API
+Claude Sonnet 4 API
   - 输入: raw_text (可能很长)
-  - 输出: compressed_text (压缩到 4000 tokens 以内)
+  - 输出: compressed_text (结构化 markdown 格式)
   - 保存到: distillations.compressed_text
   - 状态: current_layer = "compressing"
   ↓
@@ -264,19 +264,21 @@ report_generator.py
 
 ## 关键设计决策
 
-### 1. 为什么用两阶段蒸馏 (Gemini + Claude)?
+### 1. 为什么用四层蒸馏 (全部 Claude)?
 
-**问题**: 用户上传的文本可能很长 (10万字+)，直接发给 Claude 会超过 token 限制。
+**问题**: 用户上传的文本可能很长 (10万字+)，需要分层提取不同粒度的认知信息。
 
 **方案**:
-- **阶段 0**: Gemini 2.0 Flash 压缩文本到 4000 tokens 以内
-  - 优点: Gemini 便宜、速度快、长文本处理能力强
-  - 缺点: 质量不如 Claude
-- **阶段 1-3**: Claude Sonnet 4 执行三层蒸馏
-  - 优点: 质量高、理解能力强
-  - 缺点: 贵、慢
+- **阶段 0**: Claude Sonnet 4 压缩文本为结构化 markdown
+  - 保留核心观点、论据、例子，去除冗余
+  - 输出格式：markdown（标题、列表等结构化元素）
+- **阶段 1-4**: Claude Sonnet 4 执行四层蒸馏
+  - Layer 1: 段落索引提取
+  - Layer 2: 主题聚类
+  - Layer 3: 知识图谱构建
+  - Layer 4: 认知画像生成
 
-**权衡**: 用 Gemini 做"脏活"（压缩），用 Claude 做"精细活"（提取知识）。
+**权衡**: 全部使用 Claude 保证质量一致性，压缩阶段使用结构化输出便于后续处理。
 
 ### 2. 为什么 Layer 2/3 只传 paragraph_index?
 
@@ -351,7 +353,7 @@ report_generator.py
 - **数据库**: PostgreSQL 14
 - **ORM**: SQLAlchemy 2.0
 - **异步**: threading (标准库)
-- **API 客户端**: anthropic, google-generativeai
+- **API 客户端**: anthropic
 
 ### 前端
 - **框架**: React 18
@@ -370,16 +372,16 @@ report_generator.py
 ## 性能指标
 
 ### 单任务耗时 (估算)
-- Gemini 压缩: 10-20 秒
+- 文本压缩: 20-40 秒
 - Layer 1: 20-30 秒
 - Layer 2: 15-25 秒
 - Layer 3: 20-30 秒
 - Layer 4: 25-35 秒
 - 质量报告: 5-10 秒
-- **总计**: 95-150 秒 (约 1.5-2.5 分钟)
+- **总计**: 105-170 秒 (约 1.75-2.8 分钟)
 
 ### Token 消耗 (估算)
-- Gemini 压缩: 输入 10,000 tokens → 输出 4,000 tokens
+- 文本压缩: 输入 10,000 tokens → 输出 4,000 tokens
 - Layer 1: 输入 4,000 tokens → 输出 1,500 tokens
 - Layer 2: 输入 1,500 tokens → 输出 1,000 tokens
 - Layer 3: 输入 1,500 tokens → 输出 1,200 tokens
@@ -387,9 +389,8 @@ report_generator.py
 - **总计**: 约 30,400 tokens/任务
 
 ### 成本估算 (基于 API 定价)
-- Gemini 2.0 Flash: $0.10 / 1M tokens
 - Claude Sonnet 4: $3.00 / 1M input tokens, $15.00 / 1M output tokens
-- **单任务成本**: 约 $0.18-0.25
+- **单任务成本**: 约 $0.20-0.28
 
 ---
 
@@ -397,7 +398,7 @@ report_generator.py
 
 ### 当前限制
 - **并发任务数**: 受限于单机 CPU/内存（建议不超过 10 个并发任务）
-- **文本长度**: 原始文本建议不超过 20 万字（Gemini 压缩能力上限）
+- **文本长度**: 原始文本建议不超过 20 万字（Claude 上下文窗口限制）
 - **存储**: PostgreSQL 单表 JSONB 字段，建议单条记录不超过 1MB
 
 ### 未来优化方向

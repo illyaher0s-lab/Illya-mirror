@@ -180,6 +180,11 @@ body {
   100% { transform: translateX(-50%); }
 }
 
+@keyframes progressSlide {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
 .ticker-sep {
   color: var(--accent);
 }

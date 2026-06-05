@@ -22,8 +22,8 @@ class QualityEvaluator:
         """
         计算单条信念/规则/策略的置信度
         规则：
-        - 证据数>=5且来源>=3 → 高
-        - 证据数>=3且来源>=2 → 中
+        - 证据数>=3且来源>=3 → 高
+        - 证据数>=2且来源>=2 → 中
         - 其他 → 低
         """
         evidence = item.get("evidence", [])
@@ -38,9 +38,9 @@ class QualityEvaluator:
                 sources.add(source_id)
         source_count = len(sources)
         
-        if evidence_count >= 5 and source_count >= 3:
+        if evidence_count >= 3 and source_count >= 3:
             return "高"
-        elif evidence_count >= 3 and source_count >= 2:
+        elif evidence_count >= 2 and source_count >= 2:
             return "中"
         else:
             return "低"
@@ -75,7 +75,7 @@ class QualityEvaluator:
         }
         
         # 认知层
-        assumptions = layer1.get("fundamental_assumptions", [])
+        assumptions = layer1.get("foundational_assumptions", [])
         coverage["cognitive_layer"]["count"] = len(assumptions)
         coverage["cognitive_layer"]["sufficient"] = len(assumptions) >= 3
         if len(assumptions) < 3:
@@ -213,7 +213,7 @@ class QualityEvaluator:
         
         # 2. 置信度得分（30分）
         all_items = []
-        all_items.extend(layer1.get("fundamental_assumptions", []))
+        all_items.extend(layer1.get("foundational_assumptions", []))
         all_items.extend(layer2.get("reasoning_patterns", []))
         all_items.extend(layer3.get("expression_strategies", []))
         

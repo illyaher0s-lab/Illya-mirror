@@ -36,7 +36,9 @@ def compress_text(raw_text: str) -> str:
     """
     client = get_client()
     
-    prompt = """你是一个文本压缩专家。请将输入的长文本压缩为结构化格式，保留所有关键信息，但去除冗余和重复。
+    prompt = """你是一个文本压缩专家。用户上传的是个人学习材料，仅用于个人知识管理和学习目的。
+
+请将输入的长文本压缩为结构化格式，保留所有关键信息，但去除冗余和重复。
 
 要求：
 1. 保留所有核心观点、论据、例子
@@ -77,7 +79,7 @@ def extract_layer1(compressed_text: str) -> dict:
     
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=16000,
+        max_tokens=32000,
         temperature=0,
         messages=[
             {

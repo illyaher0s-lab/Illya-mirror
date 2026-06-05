@@ -16,29 +16,40 @@ export default function UploadPage() {
   const isValidLength = wordCount >= 1000 && wordCount <= 150000;
   const isValid = formData.title.trim() && formData.content.trim() && isValidLength;
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setFileLoading(true);
     toast.loading('读取文件中...', { id: 'file-upload' });
     
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target.result;
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    
+    try {
+      const response = await fetch('/api/upload-file', {
+        method: 'POST',
+        body: uploadFormData
+      });
+      
+      if (!response.ok) {
+        throw new Error('文件上传失败');
+      }
+      
+      const result = await response.json();
+      
       setFormData(prev => ({
         ...prev,
-        content: text,
+        content: result.text,
         title: prev.title || file.name.replace(/\.[^/.]+$/, '')
       }));
-      setFileLoading(false);
-      toast.success('文件读取成功', { id: 'file-upload' });
-    };
-    reader.onerror = () => {
-      setFileLoading(false);
+      toast.success(`文件读取成功（${result.encoding}）`, { id: 'file-upload' });
+    } catch (err) {
+      console.error('File upload error:', err);
       toast.error('文件读取失败，请重试', { id: 'file-upload' });
-    };
-    reader.readAsText(file);
+    } finally {
+      setFileLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {

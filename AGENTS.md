@@ -1,6 +1,6 @@
 # Mirror Project - Agent Working Rules
 
-**Last Updated**: 2026-05-14  
+**Last Updated**: 2026-05-24  
 **Purpose**: 强制执行的代码修改和调试规范，防止低质量修复和隐性 bug。
 
 **项目状态**：
@@ -8,6 +8,60 @@
 - ✅ UI 设计系统完成（Retro Sci-Fi 风格，2026-05-14）
 - ✅ 长文本支持（150,000 字上限，2026-05-14）
 - ⏳ Gemini API 集成待完成（当前压缩服务缺失）
+
+---
+
+## 如何启动项目
+
+### 本地开发
+
+**后端启动**：
+```bash
+cd ~/mirror/backend
+source venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+**前端启动**：
+```bash
+cd ~/mirror/frontend
+npm run dev
+```
+
+访问前端开发服务器（通常是 `http://localhost:5173`）
+
+**API 文档**：
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+
+### 生产环境
+
+**在线访问**：http://43.128.11.119
+
+**服务管理**（需要 sudo 权限）：
+```bash
+# 查看后端服务状态
+sudo systemctl status mirror-backend
+
+# 重启后端服务
+sudo systemctl restart mirror-backend
+
+# 查看实时日志
+sudo journalctl -u mirror-backend -f
+
+# 查看 Nginx 状态
+sudo systemctl status nginx
+
+# 重启 Nginx
+sudo systemctl restart nginx
+```
+
+**前端部署**：
+```bash
+cd ~/mirror/frontend
+npm run build
+# 构建产物在 dist/ 目录，由 Nginx 提供静态文件服务
+```
 
 ---
 
