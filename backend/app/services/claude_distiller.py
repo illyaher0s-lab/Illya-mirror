@@ -79,7 +79,7 @@ def extract_layer1(compressed_text: str) -> dict:
     
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
-        max_tokens=32000,
+        max_tokens=8000,
         temperature=0,
         messages=[
             {
